@@ -16,4 +16,5 @@ outputs:
 optimization:
 - reinforcement learning for initial training
   - loss is angle to vertical & horizontal angular velocities
+  - could also add log loss distance to enemy
 - genetic algorithm for training against opponents
