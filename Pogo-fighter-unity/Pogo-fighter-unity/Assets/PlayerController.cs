@@ -16,6 +16,9 @@ public class PlayerController : MonoBehaviour
         moveAction = InputSystem.actions.FindAction("Move");
         jumpAction = InputSystem.actions.FindAction("Jump");
         lookAction = InputSystem.actions.FindAction("Look");
+        Physics.IgnoreCollision(body.GetComponent<Collider>(), foot.GetComponent<Collider>());
+        Physics.IgnoreCollision(body.GetComponent<Collider>(), stick.GetComponent<Collider>());
+        Physics.IgnoreCollision(stick.GetComponent<Collider>(), foot.GetComponent<Collider>());
     }
 
     // Update is called once per frame
@@ -29,11 +32,11 @@ public class PlayerController : MonoBehaviour
 
         if (jumpAction.IsPressed())
         {
-            pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, 0.5f);
+            pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, 0.0f);
         }
         else
         {
-            pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, 0.0f);
+            pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, 0.5f);
         }
     }
 }

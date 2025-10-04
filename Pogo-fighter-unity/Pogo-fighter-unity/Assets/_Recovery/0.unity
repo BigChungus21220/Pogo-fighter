@@ -875,22 +875,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5324474962889567918, guid: efff91406abfed44795742821ac3dfd4, type: 3}
-      propertyPath: m_YDrive.stiffness
-      value: 1000000
-      objectReference: {fileID: 0}
-    - target: {fileID: 5324474962889567918, guid: efff91406abfed44795742821ac3dfd4, type: 3}
-      propertyPath: m_ZDrive.stiffness
-      value: 1000000
-      objectReference: {fileID: 0}
-    - target: {fileID: 5324474962889567918, guid: efff91406abfed44795742821ac3dfd4, type: 3}
-      propertyPath: m_YDrive.forceLimit
-      value: 1000000
-      objectReference: {fileID: 0}
-    - target: {fileID: 5324474962889567918, guid: efff91406abfed44795742821ac3dfd4, type: 3}
-      propertyPath: m_ZDrive.forceLimit
-      value: 1000000
-      objectReference: {fileID: 0}
-    - target: {fileID: 5324474962889567918, guid: efff91406abfed44795742821ac3dfd4, type: 3}
       propertyPath: m_ParentAnchorPosition.x
       value: -0.0000009536743
       objectReference: {fileID: 0}
@@ -898,9 +882,13 @@ PrefabInstance:
       propertyPath: m_ParentAnchorPosition.y
       value: 5.1124916
       objectReference: {fileID: 0}
+    - target: {fileID: 6783426100749762170, guid: efff91406abfed44795742821ac3dfd4, type: 3}
+      propertyPath: m_ParentAnchorPosition.y
+      value: -0.27999973
+      objectReference: {fileID: 0}
     - target: {fileID: 8806145345082231840, guid: efff91406abfed44795742821ac3dfd4, type: 3}
       propertyPath: m_ParentAnchorPosition.y
-      value: 2.5798569
+      value: 2.5798562
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1126164439464054325, guid: efff91406abfed44795742821ac3dfd4, type: 3}

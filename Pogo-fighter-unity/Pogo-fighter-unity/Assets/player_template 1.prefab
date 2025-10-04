@@ -171,7 +171,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2468229408474367733}
-  m_Father: {fileID: 2866306527517487517}
+  m_Father: {fileID: 2163399414437857781}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &2121328930734450161
 CapsuleCollider:
@@ -206,7 +206,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 400
-  m_ParentAnchorPosition: {x: 0, y: 2.5798569, z: 0}
+  m_ParentAnchorPosition: {x: 0, y: 2.5798564, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 2.5798564, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -288,7 +288,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3805011721652959782}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -353,18 +353,18 @@ ArticulationBody:
   m_YDrive:
     lowerLimit: 0
     upperLimit: 0
-    stiffness: 0
+    stiffness: 1000000
     damping: 0.2
-    forceLimit: 0
+    forceLimit: 1000000
     target: 0
     targetVelocity: 0
     driveType: 0
   m_ZDrive:
     lowerLimit: 0
     upperLimit: 0
-    stiffness: 0
+    stiffness: 1000000
     damping: 0.2
-    forceLimit: 0
+    forceLimit: 1000000
     target: 0
     targetVelocity: 0
     driveType: 0
@@ -678,12 +678,13 @@ Transform:
   m_GameObject: {fileID: 7601148007782144080}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.28, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3530644262410943363}
   - {fileID: 4980868553262593109}
+  - {fileID: 8375217961614525132}
   m_Father: {fileID: 2866306527517487517}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!171741748 &6783426100749762170
@@ -696,7 +697,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 100
-  m_ParentAnchorPosition: {x: 0, y: 0, z: 0}
+  m_ParentAnchorPosition: {x: 0, y: -0.28, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -710,11 +711,11 @@ ArticulationBody:
   m_Twist: 2
   m_XDrive:
     lowerLimit: 0
-    upperLimit: 0
-    stiffness: 0
+    upperLimit: 0.5
+    stiffness: 100000
     damping: 0.2
-    forceLimit: 0
-    target: 0
+    forceLimit: 100000
+    target: 0.5
     targetVelocity: 0
     driveType: 0
   m_YDrive:
@@ -893,7 +894,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1041390838385320014}
-  - {fileID: 8375217961614525132}
   - {fileID: 293985144764707597}
   - {fileID: 2163399414437857781}
   m_Father: {fileID: 758431447893683461}
