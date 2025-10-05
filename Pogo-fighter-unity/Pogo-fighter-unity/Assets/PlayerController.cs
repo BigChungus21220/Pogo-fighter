@@ -11,6 +11,10 @@ public class PlayerController : MonoBehaviour
     InputAction jumpAction;
     InputAction lookAction;
 
+    float mouseSensitivity = 1.0f;
+    float targetYaw = 0;
+    float targetPitch = 0;
+
     private void Start()
     {
         moveAction = InputSystem.actions.FindAction("Move");
@@ -19,6 +23,18 @@ public class PlayerController : MonoBehaviour
         Physics.IgnoreCollision(body.GetComponent<Collider>(), foot.GetComponent<Collider>());
         Physics.IgnoreCollision(body.GetComponent<Collider>(), stick.GetComponent<Collider>());
         Physics.IgnoreCollision(stick.GetComponent<Collider>(), foot.GetComponent<Collider>());
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    void OnEnable()
+    {
+        lookAction.Enable();
+    }
+
+    void OnDisable()
+    {
+        lookAction.Disable();
     }
 
     // Update is called once per frame
@@ -38,5 +54,14 @@ public class PlayerController : MonoBehaviour
         {
             pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, 0.5f);
         }
+
+        Vector2 lookInput = lookAction.ReadValue<Vector2>();
+
+        float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
+        float mouseY = lookInput.y * mouseSensitivity * Time.deltaTime;
+
+        ArticulationBody stickArticulation = stick.GetComponent<ArticulationBody>();
+        targetPitch = Mathf.Clamp(targetPitch - mouseY, -90f, 90f);
+        stickArticulation.SetDriveTarget(ArticulationDriveAxis.Y, targetPitch);
     }
 }
