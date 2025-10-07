@@ -7,12 +7,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public GameObject foot;
     [SerializeField] public GameObject stick;
     [SerializeField] public GameObject pogo;
+    [SerializeField] public GameObject floor;
     InputAction moveAction;
     InputAction jumpAction;
     InputAction lookAction;
 
-    float mouseSensitivity = 1.0f;
-    float targetYaw = 0;
+    float mouseSensitivity = 5.0f;
     float targetPitch = 0;
 
     private void Start()
@@ -37,7 +37,6 @@ public class PlayerController : MonoBehaviour
         lookAction.Disable();
     }
 
-    // Update is called once per frame
     void Update()
     {
         Vector2 moveValue = moveAction.ReadValue<Vector2>();
@@ -61,7 +60,8 @@ public class PlayerController : MonoBehaviour
         float mouseY = lookInput.y * mouseSensitivity * Time.deltaTime;
 
         ArticulationBody stickArticulation = stick.GetComponent<ArticulationBody>();
-        targetPitch = Mathf.Clamp(targetPitch - mouseY, -90f, 90f);
+        targetPitch = Mathf.Clamp(targetPitch + mouseY, -90f, 90f);
         stickArticulation.SetDriveTarget(ArticulationDriveAxis.Y, targetPitch);
+        body.GetComponent<ArticulationBody>().AddTorque(body.transform.up * mouseX * 1000, ForceMode.Force);
     }
 }
