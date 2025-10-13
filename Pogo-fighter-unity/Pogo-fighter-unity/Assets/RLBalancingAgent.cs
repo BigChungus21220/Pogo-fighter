@@ -44,7 +44,30 @@ namespace Assets
 
             Vector3 torque = new Vector3(actions.ContinuousActions[0], actions.ContinuousActions[1], actions.ContinuousActions[2]);
             _articulationBody.AddTorque(torque);
+
+            // Perfectly upright: uprighness    = 1
+            // Horizontal: uprightness          = 0
+            // Upside Down: uprightness         = -1
+            float uprightness = Vector3.Dot(transform.up, Vector3.up);
+            AddReward(uprightness * 0.01f); // Small reward each frame for being upright
         }
+        
+        // THIS SHOULD BE ATTACHED TO THE "sphere" gameObject
+        // Otherwise, the episode will immediately end "pogo" hits "floor"
+        // private void OnCollisionEnter(Collision collision)
+        // {
+        //     if (collision.gameObject.CompareTag("floor"))
+        //     {
+        //         AddReward(-1.0f);
+        //         EndEpisode();
+        //     }
+        // }
+        
+        public override void OnEpisodeBegin()
+        {
+            transform.position = Vector3.zero;
+        }
+
 
         //private void AccelerateRotationByOutput(Vector3 torque, double deltaTime = 1d) // Just use articulationBody. AddTorque
         //{
