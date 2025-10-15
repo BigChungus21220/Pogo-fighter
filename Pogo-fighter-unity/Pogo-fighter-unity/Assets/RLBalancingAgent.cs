@@ -45,11 +45,18 @@ namespace Assets
             Vector3 torque = new Vector3(actions.ContinuousActions[0], actions.ContinuousActions[1], actions.ContinuousActions[2]);
             _articulationBody.AddTorque(torque);
 
+            _articulationBody.AddForce(Vector3.up * 100); // Pickle space program
+            //transform.Translate(Vector3.up * 100);
+
+            Debug.Log("Sending to space");
+
+            Debug.Log("Action received");
+
             // Perfectly upright: uprighness    = 1
             // Horizontal: uprightness          = 0
             // Upside Down: uprightness         = -1
             float uprightness = Vector3.Dot(transform.up, Vector3.up);
-            AddReward(uprightness * 0.01f); // Small reward each frame for being upright
+            AddReward(uprightness * 0.1f); // Small reward each frame for being upright
         }
         
         // THIS SHOULD BE ATTACHED TO THE "sphere" gameObject
