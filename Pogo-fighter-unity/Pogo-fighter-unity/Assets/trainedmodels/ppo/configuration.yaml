@@ -73,7 +73,7 @@ checkpoint_settings:
   force: true
   train_model: false
   inference: false
-  results_dir: results
+  results_dir: Assets/trainedmodels
 torch_settings:
   device: null
 debug: false

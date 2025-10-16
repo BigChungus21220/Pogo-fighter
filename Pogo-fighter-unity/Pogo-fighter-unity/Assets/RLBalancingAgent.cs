@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using Unity.MLAgents.Actuators;
 using Unity.Mathematics;
 using System;
+using UnityEngine.Assertions.Must;
 
 namespace Assets
 {
@@ -12,6 +13,7 @@ namespace Assets
     {
         [SerializeField] private ArticulationBody _articulationBody;
         [SerializeField] public GameObject pogo;
+        [SerializeField] public int torqueForce;
         private InputAction _jumpAction;
         
         private void Start()
@@ -42,13 +44,8 @@ namespace Assets
             bool jumpThisFrame = actions.DiscreteActions[0] > 0;
             Jump(jumpThisFrame);
 
-            Vector3 torque = new Vector3(actions.ContinuousActions[0], actions.ContinuousActions[1], actions.ContinuousActions[2]);
+            Vector3 torque = new Vector3(actions.ContinuousActions[0], actions.ContinuousActions[1], actions.ContinuousActions[2]) * torqueForce;
             _articulationBody.AddTorque(torque);
-
-            _articulationBody.AddForce(Vector3.up * 100); // Pickle space program
-            //transform.Translate(Vector3.up * 100);
-
-            Debug.Log("Sending to space");
 
             Debug.Log("Action received");
 
@@ -59,44 +56,28 @@ namespace Assets
             AddReward(uprightness * 0.1f); // Small reward each frame for being upright
         }
         
-        // THIS SHOULD BE ATTACHED TO THE "sphere" gameObject
-        // Otherwise, the episode will immediately end "pogo" hits "floor"
-        // private void OnCollisionEnter(Collision collision)
-        // {
-        //     if (collision.gameObject.CompareTag("floor"))
-        //     {
-        //         AddReward(-1.0f);
-        //         EndEpisode();
-        //     }
-        // }
-        
-        public override void OnEpisodeBegin()
+        // Called by Sphere game object
+        public void OnFall()
         {
-            transform.position = Vector3.zero;
+            Debug.Log("Fall detected");
+            AddReward(-100);
+            RecoverToUpright();
+            //_recover = true;
         }
 
-
-        //private void AccelerateRotationByOutput(Vector3 torque, double deltaTime = 1d) // Just use articulationBody. AddTorque
-        //{
-        //    for (int i = 0; i < 3; i++) torque[i] = (float)Math.Clamp(torque[i], _torqueMin, _torqueMax);
-
-        //    // Calculate acceleration from torque
-        //    // α = (I^(−1))(τ − (ω x (Iω))) 
-
-        //    Vector3 omega = _articulationBody.angularVelocity;
-        //    Vector3 inertiaXOmega = _inertia * omega;
-        //    Vector3 omegaCross = Vector3.Cross(omega, inertiaXOmega);
-
-        //    Vector3 torqueMinusCross = torque - omegaCross;
-
-        //    Vector3 acceleration = _inertia.inverse * torqueMinusCross;
-
-        //    _articulationBody.angularVelocity += acceleration;
-        //}
+        private void RecoverToUpright()
+        {
+            _articulationBody.linearVelocity = Vector3.zero;
+            _articulationBody.angularVelocity = Vector3.zero;
+            Vector3 newPos = new Vector3(_articulationBody.transform.position.x, 1, _articulationBody.transform.position.z);
+            Quaternion newRot = Quaternion.Euler(0, _articulationBody.transform.rotation.eulerAngles.y, 0);
+            _articulationBody.TeleportRoot(newPos, newRot);
+            Debug.Log("Recovered position");
+        }
 
         private void Jump(bool jumpThisFrame)
         {
-            if (jumpThisFrame)
+            if (jumpThisFrame || true)
             {
                 pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, 0.0f);
             }

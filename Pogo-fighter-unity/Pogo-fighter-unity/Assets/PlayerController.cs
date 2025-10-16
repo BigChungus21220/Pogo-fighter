@@ -30,11 +30,15 @@ public class PlayerController : MonoBehaviour
     void OnEnable()
     {
         lookAction.Enable();
+        jumpAction.Enable();
+        moveAction.Enable();
     }
 
     void OnDisable()
     {
         lookAction.Disable();
+        jumpAction.Disable();
+        moveAction.Disable();
     }
 
     // Update is called once per frame
@@ -49,6 +53,7 @@ public class PlayerController : MonoBehaviour
         if (jumpAction.IsPressed())
         {
             pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, 0.0f);
+            Debug.Log("Player jump pressed");
         }
         else
         {
