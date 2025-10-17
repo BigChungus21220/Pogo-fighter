@@ -2,22 +2,22 @@
     "MyBehavior": {
         "checkpoints": [
             {
-                "steps": 110080,
-                "file_path": "Assets/trainedmodels\\ppo\\MyBehavior\\MyBehavior-110080.onnx",
+                "steps": 13248,
+                "file_path": "Assets/trainedmodels\\ppo\\MyBehavior\\MyBehavior-13248.onnx",
                 "reward": null,
-                "creation_time": 1760577150.1667593,
+                "creation_time": 1760654418.274439,
                 "auxillary_file_paths": [
-                    "Assets/trainedmodels\\ppo\\MyBehavior\\MyBehavior-110080.pt"
+                    "Assets/trainedmodels\\ppo\\MyBehavior\\MyBehavior-13248.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 110080,
+            "steps": 13248,
             "file_path": "Assets/trainedmodels\\ppo\\MyBehavior.onnx",
             "reward": null,
-            "creation_time": 1760577150.1667593,
+            "creation_time": 1760654418.274439,
             "auxillary_file_paths": [
-                "Assets/trainedmodels\\ppo\\MyBehavior\\MyBehavior-110080.pt"
+                "Assets/trainedmodels\\ppo\\MyBehavior\\MyBehavior-13248.pt"
             ]
         }
     },
