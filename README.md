@@ -31,4 +31,6 @@ venv setup (windows)
 - run `pip install torch`
 - run `pip install protobuf~=3.20` to fix some dumb package shit
 - run `pip install onnx`
-- run `mlagents-learn --run-id=<a string>` to start a session
+
+run a training sesh
+`mlagents-learn <config file path> --run-id=<output folder name> --force --results-dir="Assets/trainedmodels" `
