@@ -25,12 +25,9 @@ optimization:
 venv setup (windows)
 - install python 3.8.10 with `winget install Python.Python.3.8 --scope machine` in an administrator terminal
 - navigate to Pogo-figter-unity/Pogo-fighter-unity
-- run `py -3.8 -m venv venv`
-- run `./venv/Scripts/activate`
-- run `pip install mlagents`
-- run `pip install torch`
-- run `pip install protobuf~=3.20` to fix some dumb package shit
-- run `pip install onnx`
+- create venv `py -3.10 -m venv venv`
+- enter venv `./venv/Scripts/activate`
+- install packages `pip install -r requirements.txt`
 
-run a training sesh
+run a training sesh: 
 `mlagents-learn <config file path> --run-id=<output folder name> --force --results-dir="Assets/trainedmodels" `
