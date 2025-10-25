@@ -2,22 +2,58 @@
     "MyBehavior": {
         "checkpoints": [
             {
-                "steps": 2550,
-                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-2550.onnx",
-                "reward": null,
-                "creation_time": 1760662286.8167243,
+                "steps": 99953,
+                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-99953.onnx",
+                "reward": -46.41726112365723,
+                "creation_time": 1761425784.3610952,
                 "auxillary_file_paths": [
-                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-2550.pt"
+                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-99953.pt"
+                ]
+            },
+            {
+                "steps": 109945,
+                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-109945.onnx",
+                "reward": -50.25967137018839,
+                "creation_time": 1761425902.2539895,
+                "auxillary_file_paths": [
+                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-109945.pt"
+                ]
+            },
+            {
+                "steps": 119948,
+                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-119948.onnx",
+                "reward": null,
+                "creation_time": 1761426021.6012268,
+                "auxillary_file_paths": [
+                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-119948.pt"
+                ]
+            },
+            {
+                "steps": 129943,
+                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-129943.onnx",
+                "reward": -46.64216293607439,
+                "creation_time": 1761426138.4269338,
+                "auxillary_file_paths": [
+                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-129943.pt"
+                ]
+            },
+            {
+                "steps": 138750,
+                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-138750.onnx",
+                "reward": -45.922377030054726,
+                "creation_time": 1761426240.0810547,
+                "auxillary_file_paths": [
+                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-138750.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 2550,
+            "steps": 138750,
             "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior.onnx",
-            "reward": null,
-            "creation_time": 1760662286.8167243,
+            "reward": -45.922377030054726,
+            "creation_time": 1761426240.0810547,
             "auxillary_file_paths": [
-                "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-2550.pt"
+                "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-138750.pt"
             ]
         }
     },

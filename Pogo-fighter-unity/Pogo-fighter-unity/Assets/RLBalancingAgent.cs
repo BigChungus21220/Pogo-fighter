@@ -17,6 +17,11 @@ namespace Assets
         private InputAction _jumpAction;
         private Vector3 _startPos;
         private int _stepSinceFall = 0;
+
+        private float Logistic(float x)
+        {
+            return 1/(1 + Mathf.Exp(-x));
+        }
         
         private void Start()
         {
@@ -55,22 +60,27 @@ namespace Assets
             //Debug.Log("ModelIO: Output 1: jump: " + jumpThisFrame.ToString());
             //Jump(jumpThisFrame);
 
+            float reward = 0.0f;
+
             Vector3 torque = new Vector3(actions.ContinuousActions[0], actions.ContinuousActions[1], actions.ContinuousActions[2]) * torqueForce;
+            // penalty for applying torque
+            reward += -Logistic(torque.sqrMagnitude/torqueForce);
             Debug.Log("ModelIO: Output 2: torque: " + torque.ToString());
+
             _articulationBody.AddRelativeTorque(torque);
 
             // Perfectly upright: uprighness    = 1
             // Horizontal: uprightness          = 0
             // Upside Down: uprightness         = -1
             float uprightness = Vector3.Dot(_articulationBody.transform.up, Vector3.up);
-            float reward = uprightness * 0.01f;
-            float avpenalty = (float)(-0.001 * (Math.Pow(_articulationBody.angularVelocity.x, 2) + Math.Pow(_articulationBody.angularVelocity.y, 2) + Math.Pow(_articulationBody.angularVelocity.z, 2)));
-            reward += avpenalty;
+            reward += uprightness * 0.5f;
+            float avpenalty = Logistic(_articulationBody.angularVelocity.sqrMagnitude)*2 - 1;
+            reward -= avpenalty*0.125f;
             AddReward(reward); // Small reward each frame for being upright
 
             _stepSinceFall++;
 
-            Debug.Log("Adding reward for uprightness: " + reward.ToString() + ".");
+            Debug.Log("Adding reward: " + reward.ToString() + ".");
 
             //float dummyReward = actions.ContinuousActions[3];
             //AddReward(dummyReward);
