@@ -510,12 +510,16 @@ PrefabInstance:
       objectReference: {fileID: 1050907136}
     - target: {fileID: -5306822441765505104, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
       propertyPath: MaxStep
-      value: 256
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -5306822441765505104, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
       propertyPath: torqueForce
       value: 10000
       objectReference: {fileID: 0}
+    - target: {fileID: -3836986447980647270, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
+      propertyPath: m_Model
+      value: 
+      objectReference: {fileID: 5022602860645237092, guid: cb2427b442dfe2a4b864c7a8e8748d1a, type: 3}
     - target: {fileID: -3836986447980647270, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
       propertyPath: m_BehaviorName
       value: MyBehavior
