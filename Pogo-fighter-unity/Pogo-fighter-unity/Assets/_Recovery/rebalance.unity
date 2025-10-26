@@ -521,32 +521,12 @@ PrefabInstance:
       value: MyBehavior
       objectReference: {fileID: 0}
     - target: {fileID: -3836986447980647270, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
-      propertyPath: m_BrainParameters.VectorActionSpaceType
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -3836986447980647270, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
       propertyPath: m_BrainParameters.VectorObservationSize
-      value: 4
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: -3836986447980647270, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
-      propertyPath: m_BrainParameters.VectorActionSize.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -3836986447980647270, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
-      propertyPath: 'm_BrainParameters.VectorActionSize.Array.data[0]'
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: -3836986447980647270, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
-      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -3836986447980647270, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
-      propertyPath: m_BrainParameters.m_ActionSpec.m_NumContinuousActions
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: -3836986447980647270, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
-      propertyPath: 'm_BrainParameters.m_ActionSpec.BranchSizes.Array.data[0]'
-      value: 2
+      propertyPath: m_BrainParameters.NumStackedVectorObservations
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 721423185876539593, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
       propertyPath: m_ParentAnchorPosition.y
@@ -646,7 +626,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8006598791536750741, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
       propertyPath: m_ParentAnchorPosition.y
-      value: -0.2800002
+      value: -0.27999997
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

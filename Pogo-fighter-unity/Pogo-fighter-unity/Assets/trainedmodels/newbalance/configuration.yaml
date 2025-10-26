@@ -3,9 +3,9 @@ behaviors:
   MyBehavior:
     trainer_type: ppo
     hyperparameters:
-      batch_size: 16
-      buffer_size: 1024
-      learning_rate: 0.03
+      batch_size: 64
+      buffer_size: 2048
+      learning_rate: 0.0005
       beta: 0.005
       epsilon: 0.2
       lambd: 0.95
@@ -16,8 +16,8 @@ behaviors:
       epsilon_schedule: linear
     checkpoint_interval: 500000
     network_settings:
-      normalize: false
-      hidden_units: 9
+      normalize: true
+      hidden_units: 64
       num_layers: 3
       vis_encode_type: simple
       memory: null
@@ -66,10 +66,10 @@ engine_settings:
   no_graphics_monitor: false
 environment_parameters: null
 checkpoint_settings:
-  run_id: exceedinglysimpletest
+  run_id: newbalance
   initialize_from: null
   load_model: false
-  resume: true
+  resume: false
   force: true
   train_model: false
   inference: false

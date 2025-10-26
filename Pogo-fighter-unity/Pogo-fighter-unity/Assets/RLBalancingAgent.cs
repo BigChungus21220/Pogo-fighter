@@ -33,25 +33,24 @@ namespace Assets
         {
             // Rotational position (four inputs)
             // Keep in mind: rotation is a quaternion, so four inputs for the model, not one
-            Quaternion rotation = _articulationBody.transform.rotation.normalized;
+            Quaternion rotation = _articulationBody.transform.rotation;
             sensor.AddObservation(rotation);
             Debug.Log("ModelIO: Input 1: rotation: " + rotation.ToString());
 
-            // Angular velocity (four inputs)
-            //Quaternion angularVelocityQ = Quaternion.Euler(_articulationBody.angularVelocity.normalized);
-            //sensor.AddObservation(angularVelocityQ);
-            //Debug.Log("ModelIO: Input 2: angular velocity: " + angularVelocityQ.ToString());
+            // Angular velocity (three inputs)
+            Vector3 angularVelocity = _articulationBody.angularVelocity;
+            sensor.AddObservation(angularVelocity);
+            Debug.Log("ModelIO: Input 2: angular velocity: " + angularVelocity.ToString());
 
-            // Height (one input)
-            // Not passing x or z. Model does not need to know its absolute position
-            //float y = _articulationBody.transform.position.y;
-            //sensor.AddObservation(y);
-            //Debug.Log("ModelIO: Input 3: y: " + y.ToString());
+            // Position (three inputs)
+            Vector3 position = _articulationBody.transform.position;
+            sensor.AddObservation(position);
+            Debug.Log("ModelIO: Input 3: y: " + position.ToString());
 
             // Directional velocity (three inputs)
-            //Vector3 linearV = _articulationBody.linearVelocity;
-            //sensor.AddObservation(linearV);
-            //Debug.Log("ModelIO: Input 4: linear velocity: " + linearV.ToString());
+            Vector3 linearV = _articulationBody.linearVelocity;
+            sensor.AddObservation(linearV);
+            Debug.Log("ModelIO: Input 4: linear velocity: " + linearV.ToString());
         }
 
         public override void OnActionReceived(ActionBuffers actions)
@@ -63,8 +62,9 @@ namespace Assets
             float reward = 0.0f;
 
             Vector3 torque = new Vector3(actions.ContinuousActions[0], actions.ContinuousActions[1], actions.ContinuousActions[2]) * torqueForce;
+            //Vector3 torque = Vector3.zero;
             // penalty for applying torque
-            reward += -Logistic(torque.sqrMagnitude/torqueForce);
+            reward -= Logistic(torque.sqrMagnitude/torqueForce)*2 - 1;
             Debug.Log("ModelIO: Output 2: torque: " + torque.ToString());
 
             _articulationBody.AddRelativeTorque(torque);
@@ -73,7 +73,7 @@ namespace Assets
             // Horizontal: uprightness          = 0
             // Upside Down: uprightness         = -1
             float uprightness = Vector3.Dot(_articulationBody.transform.up, Vector3.up);
-            reward += uprightness * 0.5f;
+            reward += uprightness*2;
             float avpenalty = Logistic(_articulationBody.angularVelocity.sqrMagnitude)*2 - 1;
             reward -= avpenalty*0.125f;
             AddReward(reward); // Small reward each frame for being upright
@@ -90,7 +90,7 @@ namespace Assets
         // Called by Sphere game object
         public void OnFall()
         {
-            float fallReward = -2.5f;
+            float fallReward = -5f;
             Debug.Log("Steps since last fall: " + _stepSinceFall + ".");
             _stepSinceFall = 0;
             Debug.Log("Adding reward for fall: " + fallReward.ToString() + ".");

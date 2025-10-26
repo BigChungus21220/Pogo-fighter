@@ -2,58 +2,49 @@
     "MyBehavior": {
         "checkpoints": [
             {
-                "steps": 99953,
-                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-99953.onnx",
-                "reward": -46.41726112365723,
-                "creation_time": 1761425784.3610952,
+                "steps": 499980,
+                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-499980.onnx",
+                "reward": 135.66405779123306,
+                "creation_time": 1761436532.1523712,
                 "auxillary_file_paths": [
-                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-99953.pt"
+                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-499980.pt"
                 ]
             },
             {
-                "steps": 109945,
-                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-109945.onnx",
-                "reward": -50.25967137018839,
-                "creation_time": 1761425902.2539895,
+                "steps": 500044,
+                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-500044.onnx",
+                "reward": 135.66405779123306,
+                "creation_time": 1761436532.2236485,
                 "auxillary_file_paths": [
-                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-109945.pt"
+                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-500044.pt"
                 ]
             },
             {
-                "steps": 119948,
-                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-119948.onnx",
+                "steps": 500044,
+                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-500044.onnx",
                 "reward": null,
-                "creation_time": 1761426021.6012268,
+                "creation_time": 1761438650.8530774,
                 "auxillary_file_paths": [
-                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-119948.pt"
+                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-500044.pt"
                 ]
             },
             {
-                "steps": 129943,
-                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-129943.onnx",
-                "reward": -46.64216293607439,
-                "creation_time": 1761426138.4269338,
+                "steps": 914729,
+                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-914729.onnx",
+                "reward": null,
+                "creation_time": 1761443674.225983,
                 "auxillary_file_paths": [
-                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-129943.pt"
-                ]
-            },
-            {
-                "steps": 138750,
-                "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-138750.onnx",
-                "reward": -45.922377030054726,
-                "creation_time": 1761426240.0810547,
-                "auxillary_file_paths": [
-                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-138750.pt"
+                    "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-914729.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 138750,
+            "steps": 914729,
             "file_path": "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior.onnx",
-            "reward": -45.922377030054726,
-            "creation_time": 1761426240.0810547,
+            "reward": null,
+            "creation_time": 1761443674.225983,
             "auxillary_file_paths": [
-                "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-138750.pt"
+                "Assets/trainedmodels\\exceedinglysimpletest\\MyBehavior\\MyBehavior-914729.pt"
             ]
         }
     },
