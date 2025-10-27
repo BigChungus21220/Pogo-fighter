@@ -13,6 +13,7 @@ namespace Assets
     {
         [SerializeField] private ArticulationBody _articulationBody;
         [SerializeField] public GameObject pogo;
+        [SerializeField] public GameObject beans;
         [SerializeField] public int torqueForce;
         private InputAction _jumpAction;
         private Vector3 _startPos;
@@ -62,11 +63,13 @@ namespace Assets
 
         public override void OnActionReceived(ActionBuffers actions)
         {
+            float reward = 0.0f;
+
             bool is_jumping = actions.DiscreteActions[0] > 0;
             Debug.Log("ModelIO: Output 1: jump: " + is_jumping.ToString());
             SetJump(is_jumping);
 
-            float reward = 0.0f;
+            // todo: add a small penalty for changing jumping state
 
             Vector3 torque = new Vector3(actions.ContinuousActions[0], actions.ContinuousActions[1], actions.ContinuousActions[2]) * torqueForce;
             //Vector3 torque = Vector3.zero;
@@ -89,11 +92,19 @@ namespace Assets
 
             Debug.Log("Adding reward: " + reward.ToString() + ".");
 
-            // todo: add target distance penalty (will need special weighting on y axis)
+            // todo: add target distance penalty / reward (will need special weighting on y axis)
+            // y penalty = C1*(Logistic(-e^(y - 9) - e^(-10y))*2 - 1) -> absolutely no going to space or the nether
+            // xz reward = C2*(1 - Logistic(C3*|a.xz - b.xz|^2))
 
             //float dummyReward = actions.ContinuousActions[3];
             //AddReward(dummyReward);
             //Debug.Log("Adding dummy reward: " + dummyReward.ToString() + ".");
+        }
+
+        public void OnCollectBeans()
+        {
+            // add large reward (so it actually wants to collect it, not just hang around it)
+            // set new target
         }
         
         // Called by Sphere game object
@@ -120,8 +131,9 @@ namespace Assets
         private void SetTarget()
         {
             // choose a new random point to target
-            _targetPos = new Vector3(UnityEngine.Random.Range(-100f, 100f), 0, UnityEngine.Random.Range(-100f, 100f));
+            _targetPos = new Vector3(UnityEngine.Random.Range(-100f, 100f), 5f, UnityEngine.Random.Range(-100f, 100f));
             // move beans to target for visualization
+            beans.transform.position = _targetPos;
         }
 
         private void RecoverToUpright()

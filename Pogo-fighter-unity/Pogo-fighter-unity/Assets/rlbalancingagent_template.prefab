@@ -420,8 +420,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7490979100685102086}
   - component: {fileID: -3836986447980647270}
-  - component: {fileID: -5306822441765505104}
-  - component: {fileID: 1131854193406233874}
+  - component: {fileID: 6490309593983720697}
+  - component: {fileID: 3933195512706573409}
   m_Layer: 0
   m_Name: rlbalancingagent_template
   m_TagString: Untagged
@@ -459,8 +459,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.ML-Agents::Unity.MLAgents.Policies.BehaviorParameters
   m_BrainParameters:
-    VectorObservationSize: 12
-    NumStackedVectorObservations: 1
+    VectorObservationSize: 16
+    NumStackedVectorObservations: 12
     m_ActionSpec:
       m_NumContinuousActions: 3
       BranchSizes: 01000000
@@ -471,13 +471,13 @@ MonoBehaviour:
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
   m_BehaviorType: 0
-  m_BehaviorName: My Behavior
+  m_BehaviorName: Bouncing
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
   m_DeterministicInference: 0
   m_ObservableAttributeHandling: 0
---- !u!114 &-5306822441765505104
+--- !u!114 &6490309593983720697
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -486,17 +486,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 3009297854726343702}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73756c008c895d14685a0518423b4248, type: 3}
+  m_Script: {fileID: 11500000, guid: d0f1bf7dbabfb5d49a2f6b81bd336b85, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Assets.RLBalancingAgent
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.RLBouncingAgent
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 50000
+  MaxStep: 128
   _articulationBody: {fileID: 2806768295597228527}
-  pogo: {fileID: 6072973047254612530}
-  torqueForce: 0
---- !u!114 &1131854193406233874
+  pogo: {fileID: 8021755356381473742}
+  beans: {fileID: 0}
+  torqueForce: 10000
+--- !u!114 &3933195512706573409
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -508,7 +509,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.ML-Agents::Unity.MLAgents.DecisionRequester
-  DecisionPeriod: 1
+  DecisionPeriod: 5
   DecisionStep: 0
   TakeActionsBetweenDecisions: 1
 --- !u!1 &6072973047254612530
