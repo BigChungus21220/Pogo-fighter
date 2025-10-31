@@ -1,11 +1,12 @@
-﻿using UnityEngine;
-using Unity.MLAgents;
-using Unity.MLAgents.Sensors;
-using UnityEngine.InputSystem;
-using Unity.MLAgents.Actuators;
+﻿using System;
 using Unity.Mathematics;
-using System;
+using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Sensors;
+using UnityEngine;
 using UnityEngine.Assertions.Must;
+using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.LowLevel.InputStateHistory;
 
 namespace Assets
 {
@@ -15,6 +16,10 @@ namespace Assets
         [SerializeField] public GameObject pogo;
         [SerializeField] public GameObject beans;
         [SerializeField] public int torqueForce;
+        [SerializeField] public float beanCollectReward = 10.0f;
+        [SerializeField] public float yDeltaPenaltyFactor = 0.1f;
+        [SerializeField] public float xzDeltaRewardFactor = 0.1f;
+        [SerializeField] public float c3 = 0.1f;
         private InputAction _jumpAction;
         private Vector3 _startPos;
         private int _stepSinceFall = 0;
@@ -95,16 +100,25 @@ namespace Assets
             // todo: add target distance penalty / reward (will need special weighting on y axis)
             // y penalty = C1*(Logistic(-e^(y - 9) - e^(-10y))*2 - 1) -> absolutely no going to space or the nether
             // xz reward = C2*(1 - Logistic(C3*|a.xz - b.xz|^2))
-
-            //float dummyReward = actions.ContinuousActions[3];
-            //AddReward(dummyReward);
-            //Debug.Log("Adding dummy reward: " + dummyReward.ToString() + ".");
         }
+
+        private float CalculateDistancePenalty(Vector3 current, Vector3 target)
+        {
+            Vector3 delta = current - target;
+            float yPen = yDeltaPenaltyFactor * (Mathf.Log(-Mathf.Exp(delta.y - 9) - Mathf.Exp(-10 * current.y)) * 2 - 1);
+            float xzRew = xzDeltaRewardFactor * (1 - Mathf.Log(c3 * Mathf.Pow(Mathf.Abs(delta.x - delta.x), 2)));
+            xzRew += xzDeltaRewardFactor * (1 - Mathf.Log(c3 * Mathf.Pow(Mathf.Abs(delta.z - delta.z), 2)));
+
+            return xzRew + yPen;
+        }
+
 
         public void OnCollectBeans()
         {
             // add large reward (so it actually wants to collect it, not just hang around it)
-            // set new target
+            SetTarget();
+            AddReward(beanCollectReward);
+            Debug.Log("Adding reward: " + beanCollectReward.ToString() + ".");
         }
         
         // Called by Sphere game object
