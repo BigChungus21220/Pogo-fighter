@@ -153,11 +153,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &106524589
@@ -865,6 +865,14 @@ PrefabInstance:
     - target: {fileID: 3009297854726343702, guid: 9ea3ef8cff916064db93e33ea39fea15, type: 3}
       propertyPath: m_Name
       value: player_template
+      objectReference: {fileID: 0}
+    - target: {fileID: 3217210023902205254, guid: 9ea3ef8cff916064db93e33ea39fea15, type: 3}
+      propertyPath: floor
+      value: 
+      objectReference: {fileID: 106524587}
+    - target: {fileID: 5015882664083569474, guid: 9ea3ef8cff916064db93e33ea39fea15, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7490979100685102086, guid: 9ea3ef8cff916064db93e33ea39fea15, type: 3}
       propertyPath: m_LocalPosition.x

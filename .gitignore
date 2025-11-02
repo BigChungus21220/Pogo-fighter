@@ -12,7 +12,10 @@
 **/[Bb]uilds/
 **/[Ll]ogs/
 **/[Uu]ser[Ss]ettings/
+<<<<<<< HEAD
 **/venv/
+=======
+>>>>>>> 5f3f3fd15c9a0e14f1dce0e2dead94bb2edd52a3
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
