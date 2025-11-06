@@ -1,23 +1,23 @@
 {
-    "MyBehavior": {
+    "Bouncing": {
         "checkpoints": [
             {
-                "steps": 13248,
-                "file_path": "Assets/trainedmodels\\ppo\\MyBehavior\\MyBehavior-13248.onnx",
-                "reward": null,
-                "creation_time": 1760654418.274439,
+                "steps": 1408,
+                "file_path": "Assets/trainedmodels\\ppo\\Bouncing\\Bouncing-1408.onnx",
+                "reward": 92.4080682927912,
+                "creation_time": 1762472278.6894028,
                 "auxillary_file_paths": [
-                    "Assets/trainedmodels\\ppo\\MyBehavior\\MyBehavior-13248.pt"
+                    "Assets/trainedmodels\\ppo\\Bouncing\\Bouncing-1408.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 13248,
-            "file_path": "Assets/trainedmodels\\ppo\\MyBehavior.onnx",
-            "reward": null,
-            "creation_time": 1760654418.274439,
+            "steps": 1408,
+            "file_path": "Assets/trainedmodels\\ppo\\Bouncing.onnx",
+            "reward": 92.4080682927912,
+            "creation_time": 1762472278.6894028,
             "auxillary_file_paths": [
-                "Assets/trainedmodels\\ppo\\MyBehavior\\MyBehavior-13248.pt"
+                "Assets/trainedmodels\\ppo\\Bouncing\\Bouncing-1408.pt"
             ]
         }
     },

@@ -16,13 +16,15 @@ namespace Assets
         [SerializeField] public GameObject pogo;
         [SerializeField] public GameObject beans;
         [SerializeField] public int torqueForce;
-        [SerializeField] public float beanCollectReward = 10.0f;
+        [SerializeField] public float beanCollectReward = 50.0f;
         [SerializeField] public float yDeltaPenaltyFactor = 0.1f;
-        [SerializeField] public float xzDeltaRewardFactor = 0.1f;
+        [SerializeField] public float xzDeltaRewardFactor = 0.25f;
+        [SerializeField] public float xzRewardRadius = 20f;
         [SerializeField] public float c3 = 0.1f;
         private InputAction _jumpAction;
         private Vector3 _startPos;
         private int _stepSinceFall = 0;
+        private bool was_jumping = false;
 
         private Vector3 _targetPos;
 
@@ -74,40 +76,46 @@ namespace Assets
             Debug.Log("ModelIO: Output 1: jump: " + is_jumping.ToString());
             SetJump(is_jumping);
 
-            // todo: add a small penalty for changing jumping state
+            // add a small penalty for changing jumping state
+            if (is_jumping != was_jumping)
+            {
+                reward -= 0.05f;
+            }
 
             Vector3 torque = new Vector3(actions.ContinuousActions[0], actions.ContinuousActions[1], actions.ContinuousActions[2]) * torqueForce;
-            //Vector3 torque = Vector3.zero;
-            // penalty for applying torque
+            
+            // Penalty for excess torque
             reward -= Logistic(torque.sqrMagnitude/torqueForce)*2 - 1;
             Debug.Log("ModelIO: Output 2: torque: " + torque.ToString());
 
             _articulationBody.AddRelativeTorque(torque);
 
-            // Perfectly upright: uprighness    = 1
-            // Horizontal: uprightness          = 0
-            // Upside Down: uprightness         = -1
-            float uprightness = Vector3.Dot(_articulationBody.transform.up, Vector3.up);
-            reward += uprightness*2;
+            // Penalty for angular velocity
             float avpenalty = Logistic(_articulationBody.angularVelocity.sqrMagnitude)*2 - 1;
             reward -= avpenalty*0.125f;
-            AddReward(reward); // Small reward each frame for being upright
 
-            _stepSinceFall++;
+            // Reward for uprightness
+            float uprightness = Vector3.Dot(_articulationBody.transform.up, Vector3.up);
+            reward += uprightness*2;
+
+            // reward for position w respect to target
+            reward += CalculateDistanceReward(transform.position, _targetPos);
+
+            // apply reward
+            AddReward(reward);
 
             Debug.Log("Adding reward: " + reward.ToString() + ".");
 
-            // todo: add target distance penalty / reward (will need special weighting on y axis)
-            // y penalty = C1*(Logistic(-e^(y - 9) - e^(-10y))*2 - 1) -> absolutely no going to space or the nether
-            // xz reward = C2*(1 - Logistic(C3*|a.xz - b.xz|^2))
+            _stepSinceFall++;
+            was_jumping = is_jumping;
         }
 
-        private float CalculateDistancePenalty(Vector3 current, Vector3 target)
+        private float CalculateDistanceReward(Vector3 current, Vector3 target)
         {
-            Vector3 delta = current - target;
-            float yPen = yDeltaPenaltyFactor * (Mathf.Log(-Mathf.Exp(delta.y - 9) - Mathf.Exp(-10 * current.y)) * 2 - 1);
-            float xzRew = xzDeltaRewardFactor * (1 - Mathf.Log(c3 * Mathf.Pow(Mathf.Abs(delta.x - delta.x), 2)));
-            xzRew += xzDeltaRewardFactor * (1 - Mathf.Log(c3 * Mathf.Pow(Mathf.Abs(delta.z - delta.z), 2)));
+            float yPen = (0f <= current.y && current.y < 12f) ? 0 : -yDeltaPenaltyFactor;
+            // 2d gaussian
+            float xz2 = Vector3.Scale(current - target, new Vector3(1,0,1)).sqrMagnitude;
+            float xzRew = xzDeltaRewardFactor*Mathf.Exp(-xz2/(xzRewardRadius*xzRewardRadius));
 
             return xzRew + yPen;
         }
@@ -129,7 +137,6 @@ namespace Assets
             _stepSinceFall = 0;
             Debug.Log("Adding reward for fall: " + fallReward.ToString() + ".");
             AddReward(fallReward);
-            //RecoverToUpright();
             EndEpisode();
         }
 
@@ -145,7 +152,7 @@ namespace Assets
         private void SetTarget()
         {
             // choose a new random point to target
-            _targetPos = new Vector3(UnityEngine.Random.Range(-100f, 100f), 5f, UnityEngine.Random.Range(-100f, 100f));
+            _targetPos = new Vector3(UnityEngine.Random.Range(-100f, 100f), 1f, UnityEngine.Random.Range(-100f, 100f));
             // move beans to target for visualization
             beans.transform.position = _targetPos;
         }
