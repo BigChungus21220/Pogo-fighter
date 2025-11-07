@@ -19,7 +19,21 @@ public class GroundCollisionDetecter : MonoBehaviour
     {
         if (other.CompareTag("Ground"))
         {
-            GetComponentInParent<RLBalancingAgent>().OnFall();
+            RLBalancingAgent balanceA = GetComponentInParent<RLBalancingAgent>();
+
+            if (balanceA != null)
+            {
+                balanceA.OnFall();
+                return;
+            }
+
+            RLBouncingAgent bounceA = GetComponentInParent<RLBouncingAgent>();
+
+            if (bounceA != null)
+            {
+                bounceA.OnFall();
+                return;
+            }
         }
     }
 }

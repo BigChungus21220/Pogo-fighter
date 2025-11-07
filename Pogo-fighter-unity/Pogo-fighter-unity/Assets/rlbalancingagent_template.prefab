@@ -497,6 +497,11 @@ MonoBehaviour:
   pogo: {fileID: 8021755356381473742}
   beans: {fileID: 0}
   torqueForce: 10000
+  beanCollectReward: 50
+  yDeltaPenaltyFactor: 0.1
+  xzDeltaRewardFactor: 0.25
+  xzRewardRadius: 20
+  c3: 0.1
 --- !u!114 &3933195512706573409
 MonoBehaviour:
   m_ObjectHideFlags: 0
