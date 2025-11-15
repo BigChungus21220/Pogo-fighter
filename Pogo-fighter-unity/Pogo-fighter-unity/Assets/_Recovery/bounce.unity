@@ -634,6 +634,18 @@ PrefabInstance:
       propertyPath: MaxStep
       value: 2048
       objectReference: {fileID: 0}
+    - target: {fileID: 6490309593983720697, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
+      propertyPath: beanCollectReward
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6490309593983720697, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
+      propertyPath: xzDeltaRewardFactor
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 6490309593983720697, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
+      propertyPath: yDeltaPenaltyFactor
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6689358230243312984, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

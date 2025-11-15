@@ -23,7 +23,7 @@ optimization:
 
 
 venv setup (windows)
-- install python 3.8.10 with `winget install Python.Python.3.8 --scope machine` in an administrator terminal
+- install python 3.10 with `winget install Python.Python.3.10 --scope machine` in an administrator terminal
 - navigate to Pogo-figter-unity/Pogo-fighter-unity
 - create venv `py -3.10 -m venv venv`
 - enter venv `./venv/Scripts/activate`
