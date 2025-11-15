@@ -27,8 +27,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 98008415124361702}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.08506372, y: 0, z: 0, w: 0.99637556}
-  m_LocalPosition: {x: 0, y: 6.7499995, z: -10}
+  m_LocalRotation: {x: 0.08506377, y: -0, z: -0, w: 0.99637556}
+  m_LocalPosition: {x: 0, y: 6.75, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -369,9 +369,9 @@ ArticulationBody:
   m_XDrive:
     lowerLimit: 0
     upperLimit: 3
-    stiffness: 100000
-    damping: 0.2
-    forceLimit: 1000000
+    stiffness: 60000
+    damping: 0.05
+    forceLimit: 60000
     target: 0
     targetVelocity: 0
     driveType: 0
@@ -459,7 +459,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.ML-Agents::Unity.MLAgents.Policies.BehaviorParameters
   m_BrainParameters:
-    VectorObservationSize: 16
+    VectorObservationSize: 17
     NumStackedVectorObservations: 12
     m_ActionSpec:
       m_NumContinuousActions: 3
@@ -494,11 +494,13 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 128
   _articulationBody: {fileID: 2806768295597228527}
-  pogo: {fileID: 8021755356381473742}
+  pogo: {fileID: 6072973047254612530}
+  body: {fileID: 8021755356381473742}
+  foot: {fileID: 1636559193700719229}
   beans: {fileID: 0}
-  torqueForce: 10000
+  torqueForce: 30000
   beanCollectReward: 50
-  yDeltaPenaltyFactor: 0.1
+  yDeltaPenaltyFactor: 1000
   xzDeltaRewardFactor: 0.25
   xzRewardRadius: 20
   c3: 0.1
@@ -577,9 +579,9 @@ ArticulationBody:
   m_XDrive:
     lowerLimit: 0
     upperLimit: 0.5
-    stiffness: 100000
+    stiffness: 1000000
     damping: 0.2
-    forceLimit: 100000
+    forceLimit: 1000000
     target: 0.5
     targetVelocity: 0
     driveType: 0

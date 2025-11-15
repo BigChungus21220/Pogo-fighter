@@ -14,78 +14,107 @@ namespace Assets
     {
         [SerializeField] private ArticulationBody _articulationBody;
         [SerializeField] public GameObject pogo;
+        [SerializeField] public GameObject body;
+        [SerializeField] public GameObject foot;
         [SerializeField] public GameObject beans;
-        [SerializeField] public int torqueForce;
-        [SerializeField] public float beanCollectReward = 50.0f;
-        [SerializeField] public float yDeltaPenaltyFactor = 0.1f;
-        [SerializeField] public float xzDeltaRewardFactor = 0.25f;
+        [SerializeField] public float torqueForce = 30000f;
+        [SerializeField] public float beanCollectReward = 1f;
+        [SerializeField] public float yDeltaPenaltyFactor = 1f;
+        [SerializeField] public float xzDeltaRewardFactor = 0.05f;
+        [SerializeField] public float xzRewardFactor = 0.15f;
         [SerializeField] public float xzRewardRadius = 20f;
         [SerializeField] public float c3 = 0.1f;
         private InputAction _jumpAction;
         private Vector3 _startPos;
         private int _stepSinceFall = 0;
-        private bool was_jumping = false;
+        private bool _wasJumping = false;
+        private float _prevDist;
 
         private Vector3 _targetPos;
 
+        // Logistic from 0 to 1
         private float Logistic(float x)
         {
             return 1/(1 + Mathf.Exp(-x));
+        }
+
+        // logistic from -1 to 1 on 3 axies
+        private Vector3 Logistic3(Vector3 v)
+        {
+            return new Vector3(2/(1 + Mathf.Exp(-v.x)) - 1, 2/(1 + Mathf.Exp(-v.y)) - 1, 2/(1 + Mathf.Exp(-v.z)) - 1);
         }
         
         private void Start()
         {
             _jumpAction = InputSystem.actions.FindAction("Jump");
             _startPos = _articulationBody.transform.position;
+            Physics.IgnoreCollision(body.GetComponent<Collider>(), foot.GetComponent<Collider>());
+            Physics.IgnoreCollision(body.GetComponent<Collider>(), pogo.GetComponent<Collider>());
+            Physics.IgnoreCollision(pogo.GetComponent<Collider>(), foot.GetComponent<Collider>());
         }
 
         public override void CollectObservations(VectorSensor sensor)
         {
+            // need to normalize everything on [-1,1]
+
             // Rotational position (four inputs)
-            // Keep in mind: rotation is a quaternion, so four inputs for the model, not one
+            // already normalized
             Quaternion rotation = _articulationBody.transform.rotation;
             sensor.AddObservation(rotation);
             Debug.Log("ModelIO: Input 1: rotation: " + rotation.ToString());
 
             // Angular velocity (three inputs)
+            // requires normalization
             Vector3 angularVelocity = _articulationBody.angularVelocity;
-            sensor.AddObservation(angularVelocity);
+            sensor.AddObservation(Logistic3(angularVelocity/Mathf.PI));
             Debug.Log("ModelIO: Input 2: angular velocity: " + angularVelocity.ToString());
 
             // Position (three inputs)
+            // requires normalization
             Vector3 position = _articulationBody.transform.position;
-            sensor.AddObservation(position);
+            sensor.AddObservation(Logistic3(position/100));
             Debug.Log("ModelIO: Input 3: y: " + position.ToString());
 
             // Target position delta (three inputs)
+            // requires normalization
             Vector3 target = _targetPos - position;
-            sensor.AddObservation(target);
+            sensor.AddObservation(Logistic3(target/100));
             Debug.Log("ModelIO: Input 3: y: " + target.ToString());
 
-            // Directional velocity (three inputs)
+            // Translational velocity (three inputs)
+            // requires normalization
             Vector3 linearV = _articulationBody.linearVelocity;
-            sensor.AddObservation(linearV);
+            sensor.AddObservation(Logistic3(linearV));
             Debug.Log("ModelIO: Input 4: linear velocity: " + linearV.ToString());
+
+            // Was jumping last frame
+            sensor.AddObservation(_wasJumping);
         }
 
         public override void OnActionReceived(ActionBuffers actions)
         {
+
             float reward = 0.0f;
 
-            bool is_jumping = actions.DiscreteActions[0] > 0;
+            // weighted to try to help the model jump less frequently
+            bool is_jumping = actions.ContinuousActions[3] > 0.5;
             Debug.Log("ModelIO: Output 1: jump: " + is_jumping.ToString());
             SetJump(is_jumping);
 
             // add a small penalty for changing jumping state
-            if (is_jumping != was_jumping)
+            if (is_jumping != _wasJumping)
             {
                 reward -= 0.05f;
             }
 
-            Vector3 torque = new Vector3(actions.ContinuousActions[0], actions.ContinuousActions[1], actions.ContinuousActions[2]) * torqueForce;
+            Vector3 torque = new Vector3(
+                TorqueCurve(actions.ContinuousActions[0]), 
+                TorqueCurve(actions.ContinuousActions[1]), 
+                TorqueCurve(actions.ContinuousActions[2])
+            );
             
             // Penalty for excess torque
-            reward -= Logistic(torque.sqrMagnitude/torqueForce)*2 - 1;
+            reward -= 0.25f*(Logistic(torque.sqrMagnitude/torqueForce)*2 - 1);
             Debug.Log("ModelIO: Output 2: torque: " + torque.ToString());
 
             _articulationBody.AddRelativeTorque(torque);
@@ -94,12 +123,23 @@ namespace Assets
             float avpenalty = Logistic(_articulationBody.angularVelocity.sqrMagnitude)*2 - 1;
             reward -= avpenalty*0.125f;
 
+            // Penalty for out of bounds Y
+            reward += (0f <= transform.position.y && transform.position.y <= 20f) ? transform.position.y*0.05f : -yDeltaPenaltyFactor;
+
             // Reward for uprightness
             float uprightness = Vector3.Dot(_articulationBody.transform.up, Vector3.up);
-            reward += uprightness*2;
+            reward += uprightness*0.5f;
 
-            // reward for position w respect to target
-            reward += CalculateDistanceReward(transform.position, _targetPos);
+            // reward for change in distance to target
+            float dist = (transform.position - _targetPos).sqrMagnitude;
+            //float dist_reward = 2*(Logistic(-5f*(dist - _prevDist))*2 - 1);
+            float dist_reward = xzRewardFactor*Mathf.Exp(-dist*dist/(xzRewardRadius*xzRewardRadius));
+            reward += dist_reward;
+
+            if (dist < 2)
+            {
+                OnCollectBeans();
+            }
 
             // apply reward
             AddReward(reward);
@@ -107,19 +147,16 @@ namespace Assets
             Debug.Log("Adding reward: " + reward.ToString() + ".");
 
             _stepSinceFall++;
-            was_jumping = is_jumping;
+            _wasJumping = is_jumping;
+            _prevDist = dist;
         }
 
-        private float CalculateDistanceReward(Vector3 current, Vector3 target)
+        private float TorqueCurve(float x)
         {
-            float yPen = (0f <= current.y && current.y < 12f) ? 0 : -yDeltaPenaltyFactor;
-            // 2d gaussian
-            float xz2 = Vector3.Scale(current - target, new Vector3(1,0,1)).sqrMagnitude;
-            float xzRew = xzDeltaRewardFactor*Mathf.Exp(-xz2/(xzRewardRadius*xzRewardRadius));
-
-            return xzRew + yPen;
+            const float base_slope = 5f;
+            float curve = -base_slope*Mathf.Log(2/(x + 1) - 1);
+            return Mathf.Max(Mathf.Min(curve, torqueForce),-torqueForce);
         }
-
 
         public void OnCollectBeans()
         {
@@ -146,6 +183,8 @@ namespace Assets
 
             SetTarget();
 
+            _prevDist = (transform.position - _targetPos).sqrMagnitude;
+
             RecoverToUpright();
         }
 
@@ -170,11 +209,11 @@ namespace Assets
         {
             if (is_jumping)
             {
-                pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, 0.0f);
+                pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, 0.5f);
             }
             else
             {
-                pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, 0.5f);
+                pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, 0.0f);
             }
         }
     }

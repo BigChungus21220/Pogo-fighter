@@ -15,7 +15,7 @@ behaviors:
     checkpoint_interval: 500000
     network_settings:
       normalize: true
-      hidden_units: 64
+      hidden_units: 128
       num_layers: 2
     reward_signals:
       extrinsic:
@@ -27,6 +27,7 @@ behaviors:
     summary_freq: 25000
 env_settings:
   base_port: 5005
+  env_path: "../Build/Pogo-fighter-unity.exe"
   num_envs: 1
   num_areas: 1
   timeout_wait: 60
