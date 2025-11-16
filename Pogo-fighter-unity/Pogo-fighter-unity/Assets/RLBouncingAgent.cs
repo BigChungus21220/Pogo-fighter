@@ -18,6 +18,11 @@ namespace Assets
         [SerializeField] public GameObject foot;
         [SerializeField] public GameObject beans;
 
+        private const float initialTargetRadius = 4f; // initial area the target can spawn in
+        private const float targetRadiusGrowthFactor = 1.5f; // factor to multiply targetRadius by when accuracyThresh is hit
+        private const float accuracyThresh = 0.8f; // threshold to increase the target radius
+        private const int trialCount = 20; // number of attempts to avg the accuracy over
+
         private const float planeSize = 100f; // radius of the playable area
         private const float inputVelocityNormalizationFactor = 0.06f; // factor to normalize input velocity
         private const float inputAngularVelocityNormalizationFactor = 0.06f; // factor to normalize input angular velocity
@@ -31,7 +36,7 @@ namespace Assets
         private const float yPenalty = -1f; // penalty for exceeding yMax
         private const float yRewardFactor = 0.05f; // reward factor for being higher
         private const float xzRewardFactor = 0.5f; // reward factor for distance to target on xz plane
-        private const float xzRewardRadius = 20f; // radius of gaussian of xz reward
+        private const float xzDistanceFactor = 0.5f; // falloff factor for distance to target on xz plane
         private const float uprightnessRewardFactor = 0.125f; // reward for being upright
         private const float fallPenalty = -1f; // penalty for falling over
         private const float angularVelocityPenaltyFactor = -0.005f; // penalty for high angular velocity
@@ -39,6 +44,9 @@ namespace Assets
         private const float jumpThresh = 0.5f; // threshold to switch between jump states
 
 
+        private int _num_collected = 0;
+        private int _attempt_count = 0;
+        private float _targetRadius;
         private InputAction _jumpAction;
         private Vector3 _startPos;
         private int _stepSinceFall = 0;
@@ -54,6 +62,7 @@ namespace Assets
             Physics.IgnoreCollision(body.GetComponent<Collider>(), foot.GetComponent<Collider>());
             Physics.IgnoreCollision(body.GetComponent<Collider>(), pogo.GetComponent<Collider>());
             Physics.IgnoreCollision(pogo.GetComponent<Collider>(), foot.GetComponent<Collider>());
+            _targetRadius = initialTargetRadius;
         }
 
         public override void CollectObservations(VectorSensor sensor)
@@ -69,7 +78,7 @@ namespace Assets
             Debug.Log("ModelIO: Input 2: angular velocity: " + angularVelocity.ToString());
 
             // Position (three inputs)
-            Vector3 position = _articulationBody.transform.position;
+            Vector3 position = _articulationBody.centerOfMass;
             sensor.AddObservation(position / planeSize);
             Debug.Log("ModelIO: Input 3: position: " + position.ToString());
 
@@ -116,7 +125,7 @@ namespace Assets
             Debug.Log("ModelIO: Output 2: torque: " + torque.ToString());
             _articulationBody.AddRelativeTorque(torque);
 
-            Vector3 position = _articulationBody.transform.position;
+            Vector3 position = _articulationBody.centerOfMass;
 
             // Penalty for angular velocity
             float avpenalty = Logistic(_articulationBody.angularVelocity.sqrMagnitude);
@@ -131,7 +140,7 @@ namespace Assets
 
             // Reward for distance to target
             float distSqr = (position - _targetPos).sqrMagnitude;
-            reward += xzRewardFactor * Mathf.Exp(-distSqr/(xzRewardRadius*xzRewardRadius));
+            reward += xzRewardFactor * Mathf.Exp(-distSqr/(_targetRadius*_targetRadius * xzDistanceFactor*xzDistanceFactor));
 
             if (distSqr < beanCollectRadius)
             {
@@ -146,6 +155,19 @@ namespace Assets
             _stepSinceFall++;
             _wasJumping = is_jumping;
             _prevDist = distSqr;
+
+            _attempt_count++;
+
+            if (_attempt_count >= trialCount)
+            {
+                if (_num_collected/((float)_attempt_count) > accuracyThresh)
+                {
+                    _targetRadius *= targetRadiusGrowthFactor;
+                    Debug.Log("Collection accuracy: " + _num_collected/((float)_attempt_count) + ".");
+                }
+                _attempt_count = 0;
+                _num_collected = 0;
+            }
         }
 
         private float TorqueCurve(float x)
@@ -170,7 +192,8 @@ namespace Assets
             // add large reward (so it actually wants to collect it, not just hang around it)
             SetTarget();
             AddReward(beanCollectReward);
-            Debug.Log("Adding reward: " + beanCollectReward.ToString() + ".");
+            Debug.Log("Beans collected, Adding reward: " + beanCollectReward.ToString() + ".");
+            _num_collected++;
         }
         
         // Called by Sphere game object
@@ -197,7 +220,7 @@ namespace Assets
         private void SetTarget()
         {
             // choose a new random point to target
-            _targetPos = new Vector3(UnityEngine.Random.Range(-planeSize, planeSize), 1f, UnityEngine.Random.Range(-planeSize, planeSize));
+            _targetPos = new Vector3(UnityEngine.Random.Range(-_targetRadius, _targetRadius), 1f, UnityEngine.Random.Range(-_targetRadius, _targetRadius));
             // move beans to target for visualization
             beans.transform.position = _targetPos;
         }
