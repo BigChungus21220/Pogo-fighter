@@ -133,7 +133,7 @@ namespace Assets
             float distSqr = (position - _targetPos).sqrMagnitude;
             reward += xzRewardFactor * Mathf.Exp(-distSqr/(xzRewardRadius*xzRewardRadius));
 
-            if (dist < beanCollectRadius)
+            if (distSqr < beanCollectRadius)
             {
                 OnCollectBeans();
             }
