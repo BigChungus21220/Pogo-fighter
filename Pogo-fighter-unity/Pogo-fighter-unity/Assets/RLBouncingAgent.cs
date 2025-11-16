@@ -18,7 +18,7 @@ namespace Assets
         [SerializeField] public GameObject foot;
         [SerializeField] public GameObject beans;
 
-        private const float initialTargetRadius = 4f; // initial area the target can spawn in
+        private const float initialTargetRadius = 8f; // initial area the target can spawn in
         private const float targetRadiusGrowthFactor = 1.2f; // factor to multiply targetRadius by when accuracyThresh is hit
         private const float accuracyThresh = 0.8f; // threshold to increase the target radius
         private const int trialCount = 20; // number of attempts to avg the accuracy over
@@ -27,7 +27,7 @@ namespace Assets
         private const float inputVelocityNormalizationFactor = 0.06f; // factor to normalize input velocity
         private const float inputAngularVelocityNormalizationFactor = 0.06f; // factor to normalize input angular velocity
 
-        private const float torqueForce = 70000f; // max force output
+        private const float torqueForce = 30000f; // max force output
         private const float torqueBaseSlope = 5000f; // slope of force curve for model output = 0
         private const float torquePenaltyFactor = -0.05f; // penalty to apply to normalized torque magnitude
         private const float beanCollectReward = 1f; // reward for reaching target
@@ -47,7 +47,7 @@ namespace Assets
 
         private int _num_collected = 0;
         private int _attempt_count = 0;
-        private float _targetRadius;
+        private float _targetRadius = initialTargetRadius;
         private InputAction _jumpAction;
         private Vector3 _startPos;
         private int _stepSinceFall = 0;
@@ -63,7 +63,6 @@ namespace Assets
             Physics.IgnoreCollision(body.GetComponent<Collider>(), foot.GetComponent<Collider>());
             Physics.IgnoreCollision(body.GetComponent<Collider>(), pogo.GetComponent<Collider>());
             Physics.IgnoreCollision(pogo.GetComponent<Collider>(), foot.GetComponent<Collider>());
-            _targetRadius = initialTargetRadius;
         }
 
         public override void CollectObservations(VectorSensor sensor)
@@ -71,27 +70,27 @@ namespace Assets
             // Rotational position (four inputs)
             Quaternion rotation = _articulationBody.transform.rotation.normalized;
             sensor.AddObservation(rotation);
-            Debug.Log("ModelIO: Input 1: rotation: " + rotation.ToString());
+            //Debug.Log("ModelIO: Input 1: rotation: " + rotation.ToString());
 
             // Angular velocity (three inputs)
             Vector3 angularVelocity = _articulationBody.angularVelocity;
             sensor.AddObservation(angularVelocity * inputAngularVelocityNormalizationFactor);
-            Debug.Log("ModelIO: Input 2: angular velocity: " + angularVelocity.ToString());
+            //Debug.Log("ModelIO: Input 2: angular velocity: " + angularVelocity.ToString());
 
             // Position (three inputs)
             Vector3 position = _articulationBody.centerOfMass;
             sensor.AddObservation(position / planeSize);
-            Debug.Log("ModelIO: Input 3: position: " + position.ToString());
+            //Debug.Log("ModelIO: Input 3: position: " + position.ToString());
 
             // Target position delta (three inputs)
             Vector3 target = _targetPos - position;
             sensor.AddObservation(target / planeSize);
-            Debug.Log("ModelIO: Input 4: targetdelta: " + target.ToString());
+            //Debug.Log("ModelIO: Input 4: targetdelta: " + target.ToString());
 
             // Translational velocity (three inputs)
             Vector3 linearV = _articulationBody.linearVelocity;
             sensor.AddObservation(linearV * inputVelocityNormalizationFactor);
-            Debug.Log("ModelIO: Input 5: linear velocity: " + linearV.ToString());
+            //Debug.Log("ModelIO: Input 5: linear velocity: " + linearV.ToString());
 
             // Was jumping last frame
             sensor.AddObservation(_wasJumping);
@@ -104,7 +103,7 @@ namespace Assets
 
             // weighted to try to help the model jump less frequently
             bool is_jumping = actions.ContinuousActions[3] > jumpThresh;
-            Debug.Log("ModelIO: Output 1: jump: " + is_jumping.ToString());
+            //Debug.Log("ModelIO: Output 1: jump: " + is_jumping.ToString());
             pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, is_jumping ? 0.5f : 0);
 
             // add a small penalty for changing jumping state
@@ -123,7 +122,7 @@ namespace Assets
             reward += torquePenaltyFactor * baseTorque.sqrMagnitude;
 
             Vector3 torque = new Vector3(TorqueCurve(baseTorque.x), TorqueCurve(baseTorque.y), TorqueCurve(baseTorque.z));
-            Debug.Log("ModelIO: Output 2: torque: " + torque.ToString());
+            //Debug.Log("ModelIO: Output 2: torque: " + torque.ToString());
             _articulationBody.AddRelativeTorque(torque);
 
             Vector3 position = _articulationBody.transform.position;
@@ -158,7 +157,7 @@ namespace Assets
             // apply reward
             AddReward(reward);
 
-            Debug.Log("Adding reward: " + reward.ToString() + ".");
+            //Debug.Log("Adding reward: " + reward.ToString() + ".");
 
             _stepSinceFall++;
             _wasJumping = is_jumping;
@@ -187,16 +186,16 @@ namespace Assets
             // add large reward (so it actually wants to collect it, not just hang around it)
             SetTarget();
             AddReward(beanCollectReward);
-            Debug.Log("Beans collected, Adding reward: " + beanCollectReward.ToString() + ".");
+            //Debug.Log("Beans collected, Adding reward: " + beanCollectReward.ToString() + ".");
             _num_collected++;
         }
         
         // Called by Sphere game object
         public void OnFall()
         {
-            Debug.Log("Steps since last fall: " + _stepSinceFall + ".");
+            //Debug.Log("Steps since last fall: " + _stepSinceFall + ".");
             _stepSinceFall = 0;
-            Debug.Log("Adding reward for fall: " + fallPenalty.ToString() + ".");
+            //Debug.Log("Adding reward for fall: " + fallPenalty.ToString() + ".");
             AddReward(fallPenalty);
             EndEpisode();
         }
@@ -212,12 +211,13 @@ namespace Assets
             RecoverToUpright();
 
             _attempt_count++;
+            Debug.Log(_attempt_count);
             if (_attempt_count >= trialCount)
             {
+                Debug.Log("Collection accuracy: " + _num_collected/((float)_attempt_count) + ".");
                 if (_num_collected/((float)_attempt_count) > accuracyThresh)
                 {
                     _targetRadius *= targetRadiusGrowthFactor;
-                    Debug.Log("Collection accuracy: " + _num_collected/((float)_attempt_count) + ".");
                 }
                 _attempt_count = 0;
                 _num_collected = 0;
@@ -238,7 +238,7 @@ namespace Assets
             _articulationBody.angularVelocity = Vector3.zero;
             Quaternion newRot = Quaternion.Euler(0, 0, 0);
             _articulationBody.TeleportRoot(_startPos, newRot);
-            Debug.Log("Recovered position");
+            //Debug.Log("Recovered position");
         }
     }
 }
