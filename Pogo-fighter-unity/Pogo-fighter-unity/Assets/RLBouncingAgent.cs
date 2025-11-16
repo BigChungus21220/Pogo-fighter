@@ -19,7 +19,7 @@ namespace Assets
         [SerializeField] public GameObject beans;
 
         private const float initialTargetRadius = 4f; // initial area the target can spawn in
-        private const float targetRadiusGrowthFactor = 1.5f; // factor to multiply targetRadius by when accuracyThresh is hit
+        private const float targetRadiusGrowthFactor = 1.2f; // factor to multiply targetRadius by when accuracyThresh is hit
         private const float accuracyThresh = 0.8f; // threshold to increase the target radius
         private const int trialCount = 20; // number of attempts to avg the accuracy over
 
@@ -27,16 +27,17 @@ namespace Assets
         private const float inputVelocityNormalizationFactor = 0.06f; // factor to normalize input velocity
         private const float inputAngularVelocityNormalizationFactor = 0.06f; // factor to normalize input angular velocity
 
-        private const float torqueForce = 30000f; // max force output
+        private const float torqueForce = 70000f; // max force output
         private const float torqueBaseSlope = 5000f; // slope of force curve for model output = 0
-        private const float torquePenaltyFactor = -0.125f; // penalty to apply to normalized torque magnitude
+        private const float torquePenaltyFactor = -0.05f; // penalty to apply to normalized torque magnitude
         private const float beanCollectReward = 1f; // reward for reaching target
         private const float beanCollectRadius = 2f; // radius for a target to be reached
         private const float yMax = 20f; // max y value to not be punished
         private const float yPenalty = -1f; // penalty for exceeding yMax
-        private const float yRewardFactor = 0.05f; // reward factor for being higher
-        private const float xzRewardFactor = 0.5f; // reward factor for distance to target on xz plane
+        private const float yRewardFactor = 0.001f; // reward factor for being higher
+        private const float xzPenaltyFactor = -0.5f; // reward factor for distance to target on xz plane
         private const float xzDistanceFactor = 0.5f; // falloff factor for distance to target on xz plane
+        private const float velocityTargetRewardFactor = 0.125f; // factor for reward for velocity in direction of target
         private const float uprightnessRewardFactor = 0.125f; // reward for being upright
         private const float fallPenalty = -1f; // penalty for falling over
         private const float angularVelocityPenaltyFactor = -0.005f; // penalty for high angular velocity
@@ -119,30 +120,37 @@ namespace Assets
             );
             
             // Penalty for excess torque
-            reward += torquePenaltyFactor * Logistic(baseTorque.sqrMagnitude);
+            reward += torquePenaltyFactor * baseTorque.sqrMagnitude;
 
             Vector3 torque = new Vector3(TorqueCurve(baseTorque.x), TorqueCurve(baseTorque.y), TorqueCurve(baseTorque.z));
             Debug.Log("ModelIO: Output 2: torque: " + torque.ToString());
             _articulationBody.AddRelativeTorque(torque);
 
-            Vector3 position = _articulationBody.centerOfMass;
+            Vector3 position = _articulationBody.transform.position;
 
             // Penalty for angular velocity
-            float avpenalty = Logistic(_articulationBody.angularVelocity.sqrMagnitude);
-            reward += avpenalty * angularVelocityPenaltyFactor;
+            reward += _articulationBody.angularVelocity.sqrMagnitude * angularVelocityPenaltyFactor;
 
             // Rewards / penalties for y value
-            reward += (-0.1f <= position.y && position.y <= yMax) ? position.y * yRewardFactor : yPenalty;
+            reward += (position.y <= yMax) ? position.y * yRewardFactor : yPenalty;
 
             // Reward for uprightness
             float uprightness = Vector3.Dot(_articulationBody.transform.up, Vector3.up);
             reward += uprightness * uprightnessRewardFactor;
 
-            // Reward for distance to target
-            float distSqr = (position - _targetPos).sqrMagnitude;
-            reward += xzRewardFactor * Mathf.Exp(-distSqr/(_targetRadius*_targetRadius * xzDistanceFactor*xzDistanceFactor));
+            Vector3 not_up = new Vector3(1,0,1);
 
-            if (distSqr < beanCollectRadius)
+            // Reward for distance to target
+            Vector3 targetdelta = Vector3.Scale(position, not_up) - Vector3.Scale(_targetPos, not_up);
+            float distSqr = targetdelta.sqrMagnitude;
+            reward += xzPenaltyFactor * distSqr;
+
+            // Reward for velocity in target direction
+            Vector3 targetDir = targetdelta.normalized;
+            Vector3 velDir = Vector3.Scale(_articulationBody.linearVelocity, not_up);
+            reward += Vector3.Dot(targetDir, velDir)*velocityTargetRewardFactor;
+
+            if (distSqr < beanCollectRadius*beanCollectRadius)
             {
                 OnCollectBeans();
             }
@@ -155,19 +163,6 @@ namespace Assets
             _stepSinceFall++;
             _wasJumping = is_jumping;
             _prevDist = distSqr;
-
-            _attempt_count++;
-
-            if (_attempt_count >= trialCount)
-            {
-                if (_num_collected/((float)_attempt_count) > accuracyThresh)
-                {
-                    _targetRadius *= targetRadiusGrowthFactor;
-                    Debug.Log("Collection accuracy: " + _num_collected/((float)_attempt_count) + ".");
-                }
-                _attempt_count = 0;
-                _num_collected = 0;
-            }
         }
 
         private float TorqueCurve(float x)
@@ -215,6 +210,18 @@ namespace Assets
             _prevDist = (_articulationBody.transform.position - _targetPos).sqrMagnitude;
 
             RecoverToUpright();
+
+            _attempt_count++;
+            if (_attempt_count >= trialCount)
+            {
+                if (_num_collected/((float)_attempt_count) > accuracyThresh)
+                {
+                    _targetRadius *= targetRadiusGrowthFactor;
+                    Debug.Log("Collection accuracy: " + _num_collected/((float)_attempt_count) + ".");
+                }
+                _attempt_count = 0;
+                _num_collected = 0;
+            }
         }
 
         private void SetTarget()

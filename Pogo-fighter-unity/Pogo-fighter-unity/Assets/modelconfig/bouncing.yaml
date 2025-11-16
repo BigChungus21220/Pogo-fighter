@@ -15,7 +15,7 @@ behaviors:
     checkpoint_interval: 500000
     network_settings:
       normalize: true
-      hidden_units: 64
+      hidden_units: 128
       num_layers: 2
     reward_signals:
       extrinsic:

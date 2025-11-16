@@ -28,7 +28,7 @@ behaviors:
 env_settings:
   base_port: 5005
   env_path: "../Build/Pogo-fighter-unity.exe"
-  num_envs: 1
+  num_envs: 4
   num_areas: 1
   timeout_wait: 60
   max_lifetime_restarts: 10
