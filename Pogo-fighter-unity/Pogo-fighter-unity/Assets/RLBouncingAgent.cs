@@ -17,13 +17,28 @@ namespace Assets
         [SerializeField] public GameObject body;
         [SerializeField] public GameObject foot;
         [SerializeField] public GameObject beans;
-        [SerializeField] public float torqueForce = 30000f;
-        [SerializeField] public float beanCollectReward = 1f;
-        [SerializeField] public float yDeltaPenaltyFactor = 1f;
-        [SerializeField] public float xzDeltaRewardFactor = 0.05f;
-        [SerializeField] public float xzRewardFactor = 0.15f;
-        [SerializeField] public float xzRewardRadius = 20f;
-        [SerializeField] public float c3 = 0.1f;
+
+        private const float planeSize = 100f; // radius of the playable area
+        private const float inputVelocityNormalizationFactor = 0.06f; // factor to normalize input velocity
+        private const float inputAngularVelocityNormalizationFactor = 0.06f; // factor to normalize input angular velocity
+
+        private const float torqueForce = 30000f; // max force output
+        private const float torqueBaseSlope = 5000f; // slope of force curve for model output = 0
+        private const float torquePenaltyFactor = -0.125f; // penalty to apply to normalized torque magnitude
+        private const float beanCollectReward = 1f; // reward for reaching target
+        private const float beanCollectRadius = 2f; // radius for a target to be reached
+        private const float yMax = 20f; // max y value to not be punished
+        private const float yPenalty = -1f; // penalty for exceeding yMax
+        private const float yRewardFactor = 0.05f; // reward factor for being higher
+        private const float xzRewardFactor = 0.5f; // reward factor for distance to target on xz plane
+        private const float xzRewardRadius = 20f; // radius of gaussian of xz reward
+        private const float uprightnessRewardFactor = 0.125f; // reward for being upright
+        private const float fallPenalty = -1f; // penalty for falling over
+        private const float angularVelocityPenaltyFactor = -0.005f; // penalty for high angular velocity
+        private const float jumpPenalty = -0.01f; // penalty for changing jump state
+        private const float jumpThresh = 0.5f; // threshold to switch between jump states
+
+
         private InputAction _jumpAction;
         private Vector3 _startPos;
         private int _stepSinceFall = 0;
@@ -31,18 +46,6 @@ namespace Assets
         private float _prevDist;
 
         private Vector3 _targetPos;
-
-        // Logistic from 0 to 1
-        private float Logistic(float x)
-        {
-            return 1/(1 + Mathf.Exp(-x));
-        }
-
-        // logistic from -1 to 1 on 3 axies
-        private Vector3 Logistic3(Vector3 v)
-        {
-            return new Vector3(2/(1 + Mathf.Exp(-v.x)) - 1, 2/(1 + Mathf.Exp(-v.y)) - 1, 2/(1 + Mathf.Exp(-v.z)) - 1);
-        }
         
         private void Start()
         {
@@ -62,22 +65,22 @@ namespace Assets
 
             // Angular velocity (three inputs)
             Vector3 angularVelocity = _articulationBody.angularVelocity;
-            sensor.AddObservation(angularVelocity/Mathf.PI);
+            sensor.AddObservation(angularVelocity * inputAngularVelocityNormalizationFactor);
             Debug.Log("ModelIO: Input 2: angular velocity: " + angularVelocity.ToString());
 
             // Position (three inputs)
             Vector3 position = _articulationBody.transform.position;
-            sensor.AddObservation(position/100);
+            sensor.AddObservation(position / planeSize);
             Debug.Log("ModelIO: Input 3: position: " + position.ToString());
 
             // Target position delta (three inputs)
             Vector3 target = _targetPos - position;
-            sensor.AddObservation(target/100);
+            sensor.AddObservation(target / planeSize);
             Debug.Log("ModelIO: Input 4: targetdelta: " + target.ToString());
 
             // Translational velocity (three inputs)
             Vector3 linearV = _articulationBody.linearVelocity;
-            sensor.AddObservation(linearV);
+            sensor.AddObservation(linearV * inputVelocityNormalizationFactor);
             Debug.Log("ModelIO: Input 5: linear velocity: " + linearV.ToString());
 
             // Was jumping last frame
@@ -90,14 +93,14 @@ namespace Assets
             float reward = 0.0f;
 
             // weighted to try to help the model jump less frequently
-            bool is_jumping = actions.ContinuousActions[3] > 0.5;
+            bool is_jumping = actions.ContinuousActions[3] > jumpThresh;
             Debug.Log("ModelIO: Output 1: jump: " + is_jumping.ToString());
             pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, is_jumping ? 0.5f : 0);
 
             // add a small penalty for changing jumping state
             if (is_jumping != _wasJumping)
             {
-                reward -= 0.05f;
+                reward += jumpPenalty;
             }
 
             Vector3 baseTorque = new Vector3(
@@ -107,30 +110,30 @@ namespace Assets
             );
             
             // Penalty for excess torque
-            reward -= 0.25f*Logistic(baseTorque.sqrMagnitude);
+            reward += torquePenaltyFactor * Logistic(baseTorque.sqrMagnitude);
 
             Vector3 torque = new Vector3(TorqueCurve(baseTorque.x), TorqueCurve(baseTorque.y), TorqueCurve(baseTorque.z));
             Debug.Log("ModelIO: Output 2: torque: " + torque.ToString());
             _articulationBody.AddRelativeTorque(torque);
 
-            // Penalty for angular velocity
-            float avpenalty = Logistic(_articulationBody.angularVelocity.sqrMagnitude)*2 - 1;
-            reward -= avpenalty*0.125f;
+            Vector3 position = _articulationBody.transform.position;
 
-            // Penalty for out of bounds Y
-            reward += (0f <= _articulationBody.transform.position.y && _articulationBody.transform.position.y <= 20f) ? _articulationBody.transform.position.y*0.05f : -yDeltaPenaltyFactor;
+            // Penalty for angular velocity
+            float avpenalty = Logistic(_articulationBody.angularVelocity.sqrMagnitude);
+            reward += avpenalty * angularVelocityPenaltyFactor;
+
+            // Rewards / penalties for y value
+            reward += (-0.1f <= position.y && position.y <= yMax) ? position.y * yRewardFactor : yPenalty;
 
             // Reward for uprightness
             float uprightness = Vector3.Dot(_articulationBody.transform.up, Vector3.up);
-            reward += uprightness*0.5f;
+            reward += uprightness * uprightnessRewardFactor;
 
-            // reward for change in distance to target
-            float dist = (_articulationBody.transform.position - _targetPos).sqrMagnitude;
-            //float dist_reward = 2*(Logistic(-5f*(dist - _prevDist))*2 - 1);
-            float dist_reward = xzRewardFactor*Mathf.Exp(-dist/(xzRewardRadius*xzRewardRadius));
-            reward += dist_reward;
+            // Reward for distance to target
+            float distSqr = (position - _targetPos).sqrMagnitude;
+            reward += xzRewardFactor * Mathf.Exp(-distSqr/(xzRewardRadius*xzRewardRadius));
 
-            if (dist < 2)
+            if (dist < beanCollectRadius)
             {
                 OnCollectBeans();
             }
@@ -142,13 +145,24 @@ namespace Assets
 
             _stepSinceFall++;
             _wasJumping = is_jumping;
-            _prevDist = dist;
+            _prevDist = distSqr;
         }
 
         private float TorqueCurve(float x)
         {
-            float curve = Mathf.Tan(x * Mathf.PI/2);
-            return Mathf.Clamp(curve * torqueForce, -torqueForce, torqueForce);
+            return Mathf.Clamp(((torqueForce - torqueBaseSlope)*x*x + torqueBaseSlope)*x, -torqueForce, torqueForce);
+        }
+
+        // Logistic from 0 to 1
+        private float Logistic(float x)
+        {
+            return 1/(1 + Mathf.Exp(-x));
+        }
+
+        // logistic from -1 to 1 on 3 axies
+        private Vector3 Logistic3(Vector3 v)
+        {
+            return new Vector3(2/(1 + Mathf.Exp(-v.x)) - 1, 2/(1 + Mathf.Exp(-v.y)) - 1, 2/(1 + Mathf.Exp(-v.z)) - 1);
         }
 
         public void OnCollectBeans()
@@ -162,11 +176,10 @@ namespace Assets
         // Called by Sphere game object
         public void OnFall()
         {
-            float fallReward = -5f;
             Debug.Log("Steps since last fall: " + _stepSinceFall + ".");
             _stepSinceFall = 0;
-            Debug.Log("Adding reward for fall: " + fallReward.ToString() + ".");
-            AddReward(fallReward);
+            Debug.Log("Adding reward for fall: " + fallPenalty.ToString() + ".");
+            AddReward(fallPenalty);
             EndEpisode();
         }
 
@@ -184,7 +197,7 @@ namespace Assets
         private void SetTarget()
         {
             // choose a new random point to target
-            _targetPos = new Vector3(UnityEngine.Random.Range(-100f, 100f), 1f, UnityEngine.Random.Range(-100f, 100f));
+            _targetPos = new Vector3(UnityEngine.Random.Range(-planeSize, planeSize), 1f, UnityEngine.Random.Range(-planeSize, planeSize));
             // move beans to target for visualization
             beans.transform.position = _targetPos;
         }
