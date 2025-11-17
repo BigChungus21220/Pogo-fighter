@@ -4,9 +4,6 @@ using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
-using UnityEngine.InputSystem;
-using static UnityEngine.InputSystem.LowLevel.InputStateHistory;
 
 namespace Assets
 {
@@ -18,6 +15,8 @@ namespace Assets
         [SerializeField] public GameObject foot;
         [SerializeField] public GameObject beans;
 
+        private Bounds bounds = new Bounds(new Vector3(0,10,0), new Vector3(200,30,200));
+
         private const float initialTargetRadius = 8f; // initial area the target can spawn in
         private const float targetRadiusGrowthFactor = 1.2f; // factor to multiply targetRadius by when accuracyThresh is hit
         private const float accuracyThresh = 0.8f; // threshold to increase the target radius
@@ -28,37 +27,44 @@ namespace Assets
         private const float inputAngularVelocityNormalizationFactor = 0.06f; // factor to normalize input angular velocity
 
         private const float torqueForce = 30000f; // max force output
-        private const float torqueBaseSlope = 5000f; // slope of force curve for model output = 0
+        private const float torqueBaseSlope = 2000f; // slope of force curve for model output = 0
         private const float torquePenaltyFactor = -0.05f; // penalty to apply to normalized torque magnitude
-        private const float beanCollectReward = 1f; // reward for reaching target
-        private const float beanCollectRadius = 2f; // radius for a target to be reached
+        private const float beanCollectInitialReward = 0.25f; // initial reward for reaching target
+        private const float beanCollectGrowthFactor = 1.25f; // growth factor to apply when target reward is hit
+        private const float beanInitialRewardThreshold = 950f; // target average reward
+        private const float beanRewardThresholdGrowthFactor = 1.1f; // growth factor for target reward
+        private const float beanCollectRadius = 1f; // radius for a target to be reached
         private const float yMax = 20f; // max y value to not be punished
         private const float yPenalty = -1f; // penalty for exceeding yMax
-        private const float yRewardFactor = 0.001f; // reward factor for being higher
-        private const float xzPenaltyFactor = -0.5f; // reward factor for distance to target on xz plane
-        private const float xzDistanceFactor = 0.5f; // falloff factor for distance to target on xz plane
-        private const float velocityTargetRewardFactor = 0.125f; // factor for reward for velocity in direction of target
-        private const float uprightnessRewardFactor = 0.125f; // reward for being upright
+        private const float yRewardFactor = 0.0f; // reward factor for being higher
+        private const float xzPenaltyFactor = -0.0f; // penalty factor for distance to target on xz plane
+        private const float xzDistanceFactor = 0.0f; // falloff factor for distance to target on xz plane
+        private const float velocityTargetRewardFactor = 0.0f; // factor for reward for velocity in direction of target
+        private const float uprightnessRewardFactor = 0.5f; // reward for being upright
         private const float fallPenalty = -1f; // penalty for falling over
-        private const float angularVelocityPenaltyFactor = -0.005f; // penalty for high angular velocity
-        private const float jumpPenalty = -0.01f; // penalty for changing jump state
-        private const float jumpThresh = 0.5f; // threshold to switch between jump states
+        private const float angularVelocityPenaltyFactor = -0.0f; // penalty for high angular velocity
+        private const float jumpPenalty = -0.001f; // penalty for changing jump state
+        private const float jumpThresh = 0.0f; // threshold to switch between jump states
+        private const float jumpMoveDist = 1f; // amount to move the pogo by when jumping
 
 
         private int _num_collected = 0;
         private int _attempt_count = 0;
         private float _targetRadius = initialTargetRadius;
-        private InputAction _jumpAction;
         private Vector3 _startPos;
         private int _stepSinceFall = 0;
         private bool _wasJumping = false;
         private float _prevDist;
 
+        private bool _hasReachedTargetReward = false;
+        private float _beanCollectReward = beanCollectInitialReward;
+        private float _beanRewardThreshold = beanInitialRewardThreshold;
+        private int _numReached = 0;
+
         private Vector3 _targetPos;
         
         private void Start()
         {
-            _jumpAction = InputSystem.actions.FindAction("Jump");
             _startPos = _articulationBody.transform.position;
             Physics.IgnoreCollision(body.GetComponent<Collider>(), foot.GetComponent<Collider>());
             Physics.IgnoreCollision(body.GetComponent<Collider>(), pogo.GetComponent<Collider>());
@@ -78,7 +84,7 @@ namespace Assets
             //Debug.Log("ModelIO: Input 2: angular velocity: " + angularVelocity.ToString());
 
             // Position (three inputs)
-            Vector3 position = _articulationBody.centerOfMass;
+            Vector3 position = _articulationBody.worldCenterOfMass;
             sensor.AddObservation(position / planeSize);
             //Debug.Log("ModelIO: Input 3: position: " + position.ToString());
 
@@ -101,10 +107,19 @@ namespace Assets
 
             float reward = 0.0f;
 
+            Vector3 position = _articulationBody.worldCenterOfMass;
+
+            if (!bounds.Contains(position))
+            {
+                AddReward(-1);
+                EndEpisode();
+                return;
+            }
+
             // weighted to try to help the model jump less frequently
             bool is_jumping = actions.ContinuousActions[3] > jumpThresh;
             //Debug.Log("ModelIO: Output 1: jump: " + is_jumping.ToString());
-            pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, is_jumping ? 0.5f : 0);
+            pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, is_jumping ? jumpMoveDist : 0);
 
             // add a small penalty for changing jumping state
             if (is_jumping != _wasJumping)
@@ -119,19 +134,17 @@ namespace Assets
             );
             
             // Penalty for excess torque
-            reward += torquePenaltyFactor * baseTorque.sqrMagnitude;
+            reward += Saturate(torquePenaltyFactor * baseTorque.sqrMagnitude);
 
             Vector3 torque = new Vector3(TorqueCurve(baseTorque.x), TorqueCurve(baseTorque.y), TorqueCurve(baseTorque.z));
             //Debug.Log("ModelIO: Output 2: torque: " + torque.ToString());
             _articulationBody.AddRelativeTorque(torque);
 
-            Vector3 position = _articulationBody.transform.position;
-
             // Penalty for angular velocity
-            reward += _articulationBody.angularVelocity.sqrMagnitude * angularVelocityPenaltyFactor;
+            reward += Saturate(_articulationBody.angularVelocity.sqrMagnitude * angularVelocityPenaltyFactor);
 
             // Rewards / penalties for y value
-            reward += (position.y <= yMax) ? position.y * yRewardFactor : yPenalty;
+            reward += (position.y <= yMax) ? Saturate(position.y * yRewardFactor) : yPenalty;
 
             // Reward for uprightness
             float uprightness = Vector3.Dot(_articulationBody.transform.up, Vector3.up);
@@ -140,14 +153,14 @@ namespace Assets
             Vector3 not_up = new Vector3(1,0,1);
 
             // Reward for distance to target
-            Vector3 targetdelta = Vector3.Scale(position, not_up) - Vector3.Scale(_targetPos, not_up);
+            Vector3 targetdelta = Vector3.Scale(_targetPos, not_up) - Vector3.Scale(position, not_up);
             float distSqr = targetdelta.sqrMagnitude;
-            reward += xzPenaltyFactor * distSqr;
+            reward += Saturate(xzPenaltyFactor * distSqr);
 
             // Reward for velocity in target direction
             Vector3 targetDir = targetdelta.normalized;
-            Vector3 velDir = Vector3.Scale(_articulationBody.linearVelocity, not_up);
-            reward += Vector3.Dot(targetDir, velDir)*velocityTargetRewardFactor;
+            Vector3 vel = Vector3.Scale(_articulationBody.linearVelocity, not_up);
+            reward += Saturate(Vector3.Dot(targetDir, vel)*velocityTargetRewardFactor);
 
             if (distSqr < beanCollectRadius*beanCollectRadius)
             {
@@ -157,11 +170,22 @@ namespace Assets
             // apply reward
             AddReward(reward);
 
-            //Debug.Log("Adding reward: " + reward.ToString() + ".");
+            Debug.Log("Adding reward: " + reward.ToString() + ".");
+
+            if (!_hasReachedTargetReward && GetCumulativeReward() > _beanRewardThreshold)
+            {
+                _numReached ++;
+                _hasReachedTargetReward = true;
+            }
 
             _stepSinceFall++;
             _wasJumping = is_jumping;
             _prevDist = distSqr;
+        }
+
+        private float Saturate(float x)
+        {
+            return Mathf.Clamp(x,-1,1);
         }
 
         private float TorqueCurve(float x)
@@ -169,23 +193,11 @@ namespace Assets
             return Mathf.Clamp(((torqueForce - torqueBaseSlope)*x*x + torqueBaseSlope)*x, -torqueForce, torqueForce);
         }
 
-        // Logistic from 0 to 1
-        private float Logistic(float x)
-        {
-            return 1/(1 + Mathf.Exp(-x));
-        }
-
-        // logistic from -1 to 1 on 3 axies
-        private Vector3 Logistic3(Vector3 v)
-        {
-            return new Vector3(2/(1 + Mathf.Exp(-v.x)) - 1, 2/(1 + Mathf.Exp(-v.y)) - 1, 2/(1 + Mathf.Exp(-v.z)) - 1);
-        }
-
         public void OnCollectBeans()
         {
             // add large reward (so it actually wants to collect it, not just hang around it)
             SetTarget();
-            AddReward(beanCollectReward);
+            AddReward(_beanCollectReward);
             //Debug.Log("Beans collected, Adding reward: " + beanCollectReward.ToString() + ".");
             _num_collected++;
         }
@@ -204,23 +216,33 @@ namespace Assets
         {
             base.OnEpisodeBegin();
 
+            _hasReachedTargetReward = false;
+
             SetTarget();
 
-            _prevDist = (_articulationBody.transform.position - _targetPos).sqrMagnitude;
+            _prevDist = (_articulationBody.worldCenterOfMass - _targetPos).sqrMagnitude;
 
             RecoverToUpright();
 
             _attempt_count++;
-            Debug.Log(_attempt_count);
+            //Debug.Log(_attempt_count);
             if (_attempt_count >= trialCount)
             {
-                Debug.Log("Collection accuracy: " + _num_collected/((float)_attempt_count) + ".");
+                //Debug.Log("Collection accuracy: " + _num_collected/((float)_attempt_count) + ".");
                 if (_num_collected/((float)_attempt_count) > accuracyThresh)
                 {
+                    Debug.Log("Increased target radius");
                     _targetRadius *= targetRadiusGrowthFactor;
+                }
+                if (_numReached/((float)_attempt_count) > accuracyThresh)
+                {
+                    Debug.Log("Increased bean reward");
+                    _beanCollectReward *= beanCollectGrowthFactor;
+                    _beanRewardThreshold *= beanRewardThresholdGrowthFactor;
                 }
                 _attempt_count = 0;
                 _num_collected = 0;
+                _numReached = 0;
             }
         }
 

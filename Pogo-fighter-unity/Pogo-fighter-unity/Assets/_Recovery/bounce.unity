@@ -585,7 +585,7 @@ PrefabInstance:
     - target: {fileID: -3836986447980647270, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
       propertyPath: m_Model
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 5022602860645237092, guid: f4408553c19157d40af7e39e5ea3dc55, type: 3}
     - target: {fileID: -3836986447980647270, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
       propertyPath: m_BrainParameters.VectorActionSpaceType
       value: 1
@@ -644,7 +644,7 @@ PrefabInstance:
       objectReference: {fileID: 814275050}
     - target: {fileID: 6490309593983720697, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
       propertyPath: MaxStep
-      value: 2048
+      value: 32768
       objectReference: {fileID: 0}
     - target: {fileID: 6490309593983720697, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
       propertyPath: beanCollectReward

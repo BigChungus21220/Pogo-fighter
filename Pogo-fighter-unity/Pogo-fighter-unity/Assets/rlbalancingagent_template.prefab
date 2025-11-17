@@ -353,14 +353,14 @@ ArticulationBody:
   m_GameObject: {fileID: 1636559193700719229}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 400
+  m_Mass: 100
   m_ParentAnchorPosition: {x: 0, y: 2.5798562, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 2.5798564, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_MatchAnchors: 1
   m_ArticulationJointType: 1
-  m_LinearX: 1
+  m_LinearX: 2
   m_LinearY: 0
   m_LinearZ: 0
   m_SwingY: 2
@@ -368,10 +368,10 @@ ArticulationBody:
   m_Twist: 2
   m_XDrive:
     lowerLimit: 0
-    upperLimit: 3
-    stiffness: 60000
-    damping: 0.05
-    forceLimit: 60000
+    upperLimit: 6
+    stiffness: 50000
+    damping: 0
+    forceLimit: 1e+20
     target: 0
     targetVelocity: 0
     driveType: 0
@@ -393,9 +393,9 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
-  m_JointFriction: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_JointFriction: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -498,12 +498,6 @@ MonoBehaviour:
   body: {fileID: 8021755356381473742}
   foot: {fileID: 1636559193700719229}
   beans: {fileID: 0}
-  torqueForce: 30000
-  beanCollectReward: 50
-  yDeltaPenaltyFactor: 1000
-  xzDeltaRewardFactor: 0.25
-  xzRewardRadius: 20
-  c3: 0.1
 --- !u!114 &3933195512706573409
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -580,9 +574,9 @@ ArticulationBody:
     lowerLimit: 0
     upperLimit: 0.5
     stiffness: 1000000
-    damping: 0.2
-    forceLimit: 1000000
-    target: 0.5
+    damping: 0
+    forceLimit: 100000000
+    target: 1
     targetVelocity: 0
     driveType: 0
   m_YDrive:
@@ -603,9 +597,9 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
-  m_JointFriction: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_JointFriction: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -883,8 +877,8 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
   m_JointFriction: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
