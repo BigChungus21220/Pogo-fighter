@@ -28,22 +28,19 @@ namespace Assets
 
         private const float torqueForce = 30000f; // max force output
         private const float torqueBaseSlope = 2000f; // slope of force curve for model output = 0
-        private const float torquePenaltyFactor = -0.05f; // penalty to apply to normalized torque magnitude
-        private const float beanCollectInitialReward = 0.25f; // initial reward for reaching target
-        private const float beanCollectGrowthFactor = 1.25f; // growth factor to apply when target reward is hit
-        private const float beanInitialRewardThreshold = 950f; // target average reward
-        private const float beanRewardThresholdGrowthFactor = 1.1f; // growth factor for target reward
+        private const float torquePenaltyFactor = -0.0005f; // penalty to apply to normalized torque magnitude
+        private const float beanCollectReward = 1f; // reward for reaching target, start at 0.25 to train jumping
         private const float beanCollectRadius = 1f; // radius for a target to be reached
         private const float yMax = 20f; // max y value to not be punished
         private const float yPenalty = -1f; // penalty for exceeding yMax
         private const float yRewardFactor = 0.0f; // reward factor for being higher
-        private const float xzPenaltyFactor = -0.0f; // penalty factor for distance to target on xz plane
+        private const float xzPenaltyFactor = -0.0001f; // penalty factor for distance to target on xz plane
         private const float xzDistanceFactor = 0.0f; // falloff factor for distance to target on xz plane
         private const float velocityTargetRewardFactor = 0.0f; // factor for reward for velocity in direction of target
-        private const float uprightnessRewardFactor = 0.5f; // reward for being upright
+        private const float uprightnessRewardFactor = 0.005f; // reward for being upright
         private const float fallPenalty = -1f; // penalty for falling over
         private const float angularVelocityPenaltyFactor = -0.0f; // penalty for high angular velocity
-        private const float jumpPenalty = -0.001f; // penalty for changing jump state
+        private const float jumpPenalty = -0.000001f; // penalty for changing jump state
         private const float jumpThresh = 0.0f; // threshold to switch between jump states
         private const float jumpMoveDist = 1f; // amount to move the pogo by when jumping
 
@@ -55,11 +52,6 @@ namespace Assets
         private int _stepSinceFall = 0;
         private bool _wasJumping = false;
         private float _prevDist;
-
-        private bool _hasReachedTargetReward = false;
-        private float _beanCollectReward = beanCollectInitialReward;
-        private float _beanRewardThreshold = beanInitialRewardThreshold;
-        private int _numReached = 0;
 
         private Vector3 _targetPos;
         
@@ -148,7 +140,7 @@ namespace Assets
 
             // Reward for uprightness
             float uprightness = Vector3.Dot(_articulationBody.transform.up, Vector3.up);
-            reward += uprightness * uprightnessRewardFactor;
+            reward += Mathf.Min(uprightness,0.7f) * uprightnessRewardFactor;
 
             Vector3 not_up = new Vector3(1,0,1);
 
@@ -172,12 +164,6 @@ namespace Assets
 
             Debug.Log("Adding reward: " + reward.ToString() + ".");
 
-            if (!_hasReachedTargetReward && GetCumulativeReward() > _beanRewardThreshold)
-            {
-                _numReached ++;
-                _hasReachedTargetReward = true;
-            }
-
             _stepSinceFall++;
             _wasJumping = is_jumping;
             _prevDist = distSqr;
@@ -197,7 +183,7 @@ namespace Assets
         {
             // add large reward (so it actually wants to collect it, not just hang around it)
             SetTarget();
-            AddReward(_beanCollectReward);
+            AddReward(beanCollectReward);
             //Debug.Log("Beans collected, Adding reward: " + beanCollectReward.ToString() + ".");
             _num_collected++;
         }
@@ -216,8 +202,6 @@ namespace Assets
         {
             base.OnEpisodeBegin();
 
-            _hasReachedTargetReward = false;
-
             SetTarget();
 
             _prevDist = (_articulationBody.worldCenterOfMass - _targetPos).sqrMagnitude;
@@ -234,15 +218,8 @@ namespace Assets
                     Debug.Log("Increased target radius");
                     _targetRadius *= targetRadiusGrowthFactor;
                 }
-                if (_numReached/((float)_attempt_count) > accuracyThresh)
-                {
-                    Debug.Log("Increased bean reward");
-                    _beanCollectReward *= beanCollectGrowthFactor;
-                    _beanRewardThreshold *= beanRewardThresholdGrowthFactor;
-                }
                 _attempt_count = 0;
                 _num_collected = 0;
-                _numReached = 0;
             }
         }
 
