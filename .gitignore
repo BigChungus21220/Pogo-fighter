@@ -15,7 +15,7 @@
 **/venv/
 
 
-**/trainedmodels/
+**/[Aa]ssets/trainedmodels/ppo/run_logs/
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data

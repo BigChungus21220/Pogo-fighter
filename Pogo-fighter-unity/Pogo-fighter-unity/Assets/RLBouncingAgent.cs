@@ -17,7 +17,7 @@ namespace Assets
 
         private Bounds bounds = new Bounds(new Vector3(0,10,0), new Vector3(200,30,200));
 
-        private const float initialTargetRadius = 8f; // initial area the target can spawn in
+        private const float initialTargetRadius = 20f; // initial area the target can spawn in
         private const float targetRadiusGrowthFactor = 1.2f; // factor to multiply targetRadius by when accuracyThresh is hit
         private const float accuracyThresh = 0.8f; // threshold to increase the target radius
         private const int trialCount = 20; // number of attempts to avg the accuracy over
