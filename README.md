@@ -31,3 +31,10 @@ venv setup (windows)
 
 run a training sesh: 
 `mlagents-learn <config file path> --run-id=<output folder name> --force --results-dir="Assets/trainedmodels" `
+
+setup config to intialize from previous checkpoint:
+```yaml
+behaviors:
+  Bouncing:
+    init_path: "./Assets/trainedmodels/ppo/<folder name>/<checkpoint name>.pt" # eg: `./Assets/trainedmodels/ppo/Bouncing-base/Bouncing-3315108.pt` to init from the bouncing model
+```
