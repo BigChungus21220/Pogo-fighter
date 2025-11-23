@@ -17,7 +17,7 @@ namespace Assets
 
         private Bounds bounds = new Bounds(new Vector3(0,10,0), new Vector3(200,30,200));
 
-        private const float initialTargetRadius = 20f; // initial area the target can spawn in
+        private const float initialTargetRadius = 16f; // initial area the target can spawn in
         private const float targetRadiusGrowthFactor = 1.2f; // factor to multiply targetRadius by when accuracyThresh is hit
         private const float accuracyThresh = 0.8f; // threshold to increase the target radius
         private const int trialCount = 20; // number of attempts to avg the accuracy over
@@ -29,11 +29,11 @@ namespace Assets
         private const float torqueForce = 30000f; // max force output
         private const float torqueBaseSlope = 2000f; // slope of force curve for model output = 0
         private const float torquePenaltyFactor = -0.0005f; // penalty to apply to normalized torque magnitude
-        private const float beanCollectReward = 1f; // reward for reaching target, start at 0.25 to train jumping
+        private const float beanCollectReward = 5f; // reward for reaching target, start at 0.25 to train jumping
         private const float beanCollectRadius = 1f; // radius for a target to be reached
         private const float yMax = 20f; // max y value to not be punished
         private const float yPenalty = -1f; // penalty for exceeding yMax
-        private const float yRewardFactor = 0.0f; // reward factor for being higher
+        private const float yRewardFactor = 0.0001f; // reward factor for being higher
         private const float xzPenaltyFactor = -0.0001f; // penalty factor for distance to target on xz plane
         private const float xzDistanceFactor = 0.0f; // falloff factor for distance to target on xz plane
         private const float velocityTargetRewardFactor = 0.0f; // factor for reward for velocity in direction of target
