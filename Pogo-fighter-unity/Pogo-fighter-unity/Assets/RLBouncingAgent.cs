@@ -17,8 +17,8 @@ namespace Assets
 
         private Bounds bounds = new Bounds(new Vector3(0,10,0), new Vector3(200,30,200));
 
-        private const float initialTargetRadius = 16f; // initial area the target can spawn in
-        private const float targetRadiusGrowthFactor = 1.2f; // factor to multiply targetRadius by when accuracyThresh is hit
+        private const float initialTargetRadius = 30f; // initial area the target can spawn in
+        private const float targetRadiusGrowthFactor = 1.0f; // factor to multiply targetRadius by when accuracyThresh is hit
         private const float accuracyThresh = 0.8f; // threshold to increase the target radius
         private const int trialCount = 20; // number of attempts to avg the accuracy over
 
@@ -28,19 +28,19 @@ namespace Assets
 
         private const float torqueForce = 30000f; // max force output
         private const float torqueBaseSlope = 2000f; // slope of force curve for model output = 0
-        private const float torquePenaltyFactor = -0.0005f; // penalty to apply to normalized torque magnitude
-        private const float beanCollectReward = 10f; // reward for reaching target, start at 0.25 to train jumping
-        private const float beanCollectRadius = 1f; // radius for a target to be reached
+        private const float torquePenaltyFactor = -0.00005f; // penalty to apply to normalized torque magnitude
+        private const float beanCollectReward = 1f; // reward for reaching target, start at 0.25 to train jumping
+        private const float beanCollectRadius = 2f; // radius for a target to be reached
         private const float yMax = 20f; // max y value to not be punished
         private const float yPenalty = -1f; // penalty for exceeding yMax
-        private const float yRewardFactor = 0.005f; // reward factor for being higher
-        private const float xzPenaltyFactor = -0.0001f; // penalty factor for distance to target on xz plane
+        private const float yRewardFactor = 0.002f; // reward factor for being higher
+        private const float xzPenaltyFactor = -0.0f; // penalty factor for distance to target on xz plane
         private const float xzDistanceFactor = 0.0f; // falloff factor for distance to target on xz plane
-        private const float velocityTargetRewardFactor = 0.0f; // factor for reward for velocity in direction of target
-        private const float uprightnessRewardFactor = 0.005f; // reward for being upright
+        private const float velocityTargetRewardFactor = 0.000001f; // factor for reward for velocity in direction of target
+        private const float uprightnessRewardFactor = 0.0005f; // reward for being upright
         private const float fallPenalty = -1f; // penalty for falling over
         private const float angularVelocityPenaltyFactor = -0.0f; // penalty for high angular velocity
-        private const float jumpPenalty = -0.000001f; // penalty for changing jump state
+        private const float jumpPenalty = -0.0000001f; // penalty for changing jump state
         private const float jumpThresh = 0.0f; // threshold to switch between jump states
         private const float jumpMoveDist = 1f; // amount to move the pogo by when jumping
 
