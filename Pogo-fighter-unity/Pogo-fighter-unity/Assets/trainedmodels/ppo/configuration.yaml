@@ -5,8 +5,8 @@ behaviors:
     hyperparameters:
       batch_size: 512
       buffer_size: 80000
-      learning_rate: 2.0e-05
-      beta: 0.0005
+      learning_rate: 0.0001
+      beta: 0.005
       epsilon: 0.2
       lambd: 0.95
       num_epoch: 5
@@ -48,7 +48,7 @@ env_settings:
   env_path: ../Build/Pogo-fighter-unity.exe
   env_args: null
   base_port: 5005
-  num_envs: 4
+  num_envs: 2
   num_areas: 1
   timeout_wait: 60
   seed: -1
