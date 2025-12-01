@@ -54,7 +54,9 @@ namespace Assets
         private float _prevDist;
 
         private Vector3 _targetPos;
-        
+        public float CurrentReward { get; private set; }
+        public float CumulativeReward { get; private set; }
+
         private void Start()
         {
             _startPos = _articulationBody.transform.position;
@@ -103,6 +105,8 @@ namespace Assets
 
             if (!bounds.Contains(position))
             {
+                CurrentReward = reward;
+                CumulativeReward += reward;
                 AddReward(-1);
                 EndEpisode();
                 return;
@@ -160,6 +164,8 @@ namespace Assets
             }
 
             // apply reward
+            CurrentReward = reward;
+            CumulativeReward += reward;
             AddReward(reward);
 
             Debug.Log("Adding reward: " + reward.ToString() + ".");
@@ -183,6 +189,8 @@ namespace Assets
         {
             // add large reward (so it actually wants to collect it, not just hang around it)
             SetTarget();
+            CurrentReward = beanCollectReward;
+            CumulativeReward += beanCollectReward;
             AddReward(beanCollectReward);
             //Debug.Log("Beans collected, Adding reward: " + beanCollectReward.ToString() + ".");
             _num_collected++;
@@ -194,6 +202,8 @@ namespace Assets
             //Debug.Log("Steps since last fall: " + _stepSinceFall + ".");
             _stepSinceFall = 0;
             //Debug.Log("Adding reward for fall: " + fallPenalty.ToString() + ".");
+            CurrentReward = fallPenalty;
+            CumulativeReward += fallPenalty;
             AddReward(fallPenalty);
             EndEpisode();
         }
