@@ -5,11 +5,11 @@ behaviors:
     hyperparameters:
       batch_size: 512
       buffer_size: 80000
-      learning_rate: 0.0001
+      learning_rate: 0.0003
       beta: 0.005
       epsilon: 0.2
       lambd: 0.95
-      num_epoch: 5
+      num_epoch: 3
       shared_critic: false
       learning_rate_schedule: linear
       beta_schedule: linear
@@ -35,7 +35,7 @@ behaviors:
           memory: null
           goal_conditioning_type: hyper
           deterministic: false
-    init_path: null
+    init_path: ./Assets/trainedmodels/ppo/Long-Bouncing2/Bouncing-10000025.pt
     keep_checkpoints: 5
     even_checkpoints: false
     max_steps: 10000000
@@ -46,7 +46,9 @@ behaviors:
     behavioral_cloning: null
 env_settings:
   env_path: ../Build/Pogo-fighter-unity.exe
-  env_args: null
+  env_args:
+  - -logfile
+  - '-'
   base_port: 5005
   num_envs: 2
   num_areas: 1
@@ -69,7 +71,7 @@ checkpoint_settings:
   run_id: ppo
   initialize_from: null
   load_model: false
-  resume: true
+  resume: false
   force: true
   train_model: false
   inference: false

@@ -17,8 +17,8 @@ namespace Assets
 
         private Bounds bounds = new Bounds(new Vector3(0,10,0), new Vector3(200,30,200));
 
-        private const float initialTargetRadius = 30f; // initial area the target can spawn in
-        private const float targetRadiusGrowthFactor = 1.0f; // factor to multiply targetRadius by when accuracyThresh is hit
+        private const float initialTargetRadius = 5f; // initial area the target can spawn in
+        private const float targetRadiusGrowthFactor = 1.01f; // factor to multiply targetRadius by when accuracyThresh is hit
         private const float accuracyThresh = 0.8f; // threshold to increase the target radius
         private const int trialCount = 20; // number of attempts to avg the accuracy over
 
@@ -30,13 +30,12 @@ namespace Assets
         private const float torqueBaseSlope = 2000f; // slope of force curve for model output = 0
         private const float torquePenaltyFactor = -0.001f; // penalty to apply to normalized torque magnitude
         private const float beanCollectReward = 10f; // reward for reaching target, start at 0.25 to train jumping
-        private const float beanCollectRadius = 2f; // radius for a target to be reached
+        private const float beanCollectRadius = 0.5f; // radius for a target to be reached
         private const float yMax = 20f; // max y value to not be punished
         private const float yPenalty = -1f; // penalty for exceeding yMax
         private const float yRewardFactor = 0.0001f; // reward factor for being higher
         private const float xzPenaltyFactor = -0.0f; // penalty factor for distance to target on xz plane
-        private const float xzDistanceFactor = 0.0f; // falloff factor for distance to target on xz plane
-        private const float velocityTargetRewardFactor = 0.0001f; // factor for reward for velocity in direction of target
+        private const float velocityTargetRewardFactor = 0.000f; // factor for reward for velocity in direction of target
         private const float uprightnessRewardFactor = 0.0f; // reward for being upright
         private const float fallPenalty = -1f; // penalty for falling over
         private const float angularVelocityPenaltyFactor = -0.0f; // penalty for high angular velocity
@@ -215,8 +214,8 @@ namespace Assets
                 //Debug.Log("Collection accuracy: " + _num_collected/((float)_attempt_count) + ".");
                 if (_num_collected/((float)_attempt_count) > accuracyThresh)
                 {
-                    Debug.Log("Increased target radius");
                     _targetRadius *= targetRadiusGrowthFactor;
+                    Debug.Log("Increased target radius to " + _targetRadius);
                 }
                 _attempt_count = 0;
                 _num_collected = 0;
