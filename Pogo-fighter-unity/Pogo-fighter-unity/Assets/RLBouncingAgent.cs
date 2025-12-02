@@ -4,6 +4,7 @@ using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
+using UnityEngine.InputSystem; 
 
 namespace Assets
 {
@@ -249,5 +250,61 @@ namespace Assets
             _articulationBody.TeleportRoot(_startPos, newRot);
             //Debug.Log("Recovered position");
         }
+
+
+
+
+        // InputAction moveAction;
+        // InputAction jumpAction;
+        // InputAction lookAction;
+        // float mouseSensitivity = 1.0f;
+        // float targetYaw = 0;
+        // float targetPitch = 0;
+
+        // protected override void OnEnable()
+        // {
+        //     lookAction.Enable();
+        //     jumpAction.Enable();
+        //     moveAction.Enable();
+        // }
+
+        // protected override void OnDisable()
+        // {
+        //     lookAction.Disable();
+        //     jumpAction.Disable();
+        //     moveAction.Disable();
+        // }
+
+        // public override void Heuristic(in ActionBuffers actionsOut)
+        // {            
+        //     Vector2 moveValue = moveAction.ReadValue<Vector2>();
+        //     Debug.DrawLine(body.transform.position, body.transform.position + body.transform.right, Color.red);
+        //     Debug.DrawLine(body.transform.position, body.transform.position + body.transform.forward, Color.blue);
+        //     body.GetComponent<ArticulationBody>().AddTorque(body.transform.right * moveValue.y * 10000, ForceMode.Force);
+        //     body.GetComponent<ArticulationBody>().AddTorque(body.transform.forward * moveValue.x * 10000, ForceMode.Force);
+
+        //     if (jumpAction.IsPressed())
+        //     {
+        //         pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, 0.0f);
+        //         Debug.Log("Player jump pressed");
+        //     }
+        //     else
+        //     {
+        //         pogo.GetComponent<ArticulationBody>().SetDriveTarget(ArticulationDriveAxis.X, 0.5f);
+        //     }
+
+        //     Vector2 lookInput = lookAction.ReadValue<Vector2>();
+
+        //     float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
+        //     float mouseY = lookInput.y * mouseSensitivity * Time.deltaTime;
+
+        //     // CONVERT ACTIONS AS-DONE ABOVE, INTO ACTIONS as-if THE AGENT HAD DONE THEM TO CALCULATE REWARD
+        //     // var continuousActionsOut = actionsOut.ContinuousActions;
+        //     // continuousActionsOut[0] = 
+        //     // continuousActionsOut[1] = 
+        //     // continuousActionsOut[2] = 
+
+        //     OnActionReceived(actionsOut);            
+        // }
     }
 }

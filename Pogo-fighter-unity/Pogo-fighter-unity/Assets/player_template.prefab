@@ -583,6 +583,7 @@ MonoBehaviour:
   foot: {fileID: 1636559193700719229}
   stick: {fileID: 2583318177878784475}
   pogo: {fileID: 6072973047254612530}
+  _articulationBody: {fileID: 0}
 --- !u!1 &6072973047254612530
 GameObject:
   m_ObjectHideFlags: 0
