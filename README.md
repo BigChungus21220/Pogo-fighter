@@ -17,9 +17,9 @@ Run `/Pogo-fighter-unity/Build/Pogo-fighter-unity.exe`
 - Install packages `pip install -r requirements.txt`
 
 ### Running a Training Session: 
-Enter the venv, then run `mlagents-learn <config file path> --run-id=<output folder name> --force --results-dir="Assets/trainedmodels" `
-`--resume` flag can be used to continue training from the last session
-`--initialize-from={run_id or checkpoint file path}` option can be used to train from an existing model without resuming with the same training parameters
+Enter the venv, then run `mlagents-learn <config file path> --run-id=<output folder name> --force --results-dir="Assets/trainedmodels" `\
+The `--resume` flag can be used to continue training from the last session\
+The `--initialize-from={run_id or checkpoint file path}` option can be used to train from an existing model without resuming with the same training parameters
 
 Setup config to intialize from previous checkpoint:
 ```yaml
