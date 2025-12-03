@@ -475,11 +475,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e1bdea1635c096244b56b1940ba70c5e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::cameraController
-  sensitivity: 1
-  slowSpeed: 2
-  normalSpeed: 5
-  sprintSpeed: 10
+  m_EditorClassIdentifier: Assembly-CSharp::CameraController
+  sensitivity: 0.1
+  slowSpeed: 5
+  normalSpeed: 20
+  sprintSpeed: 40
 --- !u!1001 &814275049
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -569,7 +569,7 @@ PrefabInstance:
     - target: {fileID: -3836986447980647270, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
       propertyPath: m_Model
       value: 
-      objectReference: {fileID: 5022602860645237092, guid: 3af44bf455194ee48b5a5d8cdbb036a9, type: 3}
+      objectReference: {fileID: 5022602860645237092, guid: a3c7739aa4333bd49ba17cecf41c7bf4, type: 3}
     - target: {fileID: -3836986447980647270, guid: 7ea4b08839d2c2243a4a0bbd8715dbac, type: 3}
       propertyPath: m_BrainParameters.VectorActionSpaceType
       value: 1

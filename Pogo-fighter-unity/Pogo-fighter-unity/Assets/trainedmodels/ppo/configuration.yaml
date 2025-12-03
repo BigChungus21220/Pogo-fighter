@@ -35,7 +35,7 @@ behaviors:
           memory: null
           goal_conditioning_type: hyper
           deterministic: false
-    init_path: ./Assets/trainedmodels/ppo/Long-Bouncing2/Bouncing-10000025.pt
+    init_path: null
     keep_checkpoints: 5
     even_checkpoints: false
     max_steps: 10000000
@@ -46,9 +46,7 @@ behaviors:
     behavioral_cloning: null
 env_settings:
   env_path: ../Build/Pogo-fighter-unity.exe
-  env_args:
-  - -logfile
-  - '-'
+  env_args: null
   base_port: 5005
   num_envs: 2
   num_areas: 1
@@ -71,7 +69,7 @@ checkpoint_settings:
   run_id: ppo
   initialize_from: null
   load_model: false
-  resume: false
+  resume: true
   force: true
   train_model: false
   inference: false
