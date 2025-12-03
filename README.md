@@ -11,7 +11,7 @@ Run `/Pogo-fighter-unity/Build/Pogo-fighter-unity.exe`
 - Click `File > Build and Run` in the Unity Editor to build and run the app
 
 ### Virtual Environment Setup (required for training):
-- Navigate to Pogo-figter-unity/Pogo-fighter-unity
+- Navigate to Pogo-figter-unity/Pogo-fighter-unity in a terminal
 - Create venv `py -3.10 -m venv venv`
 - Enter venv `./venv/Scripts/activate`
 - Install packages `pip install -r requirements.txt`
